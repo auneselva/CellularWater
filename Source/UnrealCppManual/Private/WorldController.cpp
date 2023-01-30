@@ -3,7 +3,7 @@
 #include "WorldController.h"
 #include "WaterCell.h"
 #include "Cell.h"
-#define BOUND 10
+#define BOUND 7
 #define N_CELLS (BOUND + BOUND) * (BOUND + BOUND) * (BOUND + BOUND)
 #define CELL_SIZE 100.0
 
@@ -19,7 +19,7 @@ AWorldController::AWorldController()
 	ZRightBound = BOUND;
 	grid3d = new Cell[N_CELLS];
 	for (int i = 0; i < N_CELLS; i++)
-		grid3d[i].CalculatePosition(i, CELL_SIZE, XLeftBound, XRightBound, YLeftBound, YRightBound);
+		grid3d[i].CalculatePosition(i, CELL_SIZE, XLeftBound, XRightBound, YLeftBound, YRightBound, ZLeftBound, ZRightBound);
 
 	//UE_LOG(LogTemp, Warning, TEXT("Grid3d %d"), grid3d[7999].waterCell );
 
@@ -29,14 +29,18 @@ AWorldController::~AWorldController()
 	delete[] grid3d;
 }
 
-int AWorldController::GetCellIndex(const FIntVector& cellPosition) {
+int AWorldController::GetCellIndexAtSnappedPosition(const FIntVector& cellPosition) {
 	if (!CheckIfInBoundaries(cellPosition.X, cellPosition.Y, cellPosition.Z))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Trying to spawn out of borders!"));
 		return -1;
 	}
+	const FIntVector* localCoordinates = TranslateCellCoordinatesToLocal(cellPosition);
+	return localCoordinates->X + (XRightBound - XLeftBound) * localCoordinates->Y + (XRightBound - XLeftBound) * (YRightBound - YLeftBound) * localCoordinates->Z;
+}
+const FIntVector* AWorldController::TranslateCellCoordinatesToLocal(const FIntVector& cellPosition) {
 
-	return cellPosition.X + (XRightBound - XLeftBound) * cellPosition.Y + (XRightBound - XLeftBound) * (YRightBound - YLeftBound) * cellPosition.Z;
+	return std::move(new FIntVector(cellPosition.X - XLeftBound, cellPosition.Y - YLeftBound, cellPosition.Z - ZLeftBound));
 }
 
 bool AWorldController::CheckIfInBoundaries(const int& x, const int& y, const int& z) {
@@ -49,15 +53,14 @@ bool AWorldController::CheckIfInBoundaries(const int& x, const int& y, const int
 	return true;
 }
 
-std::pair<FVector, int> AWorldController::GetCellIndexAndNewPosition(const FVector& position) {
+int AWorldController::GetCellIndexAtFloatPosition(const FVector& position) {
 
-	FIntVector* gridTranslatedPosition = new FIntVector((const int)(position.X / CELL_SIZE), (const int)(position.Y / CELL_SIZE), (const int)(position.Z / CELL_SIZE));
-	FVector* spawnPosition = new FVector((double) (gridTranslatedPosition->X * CELL_SIZE), (double)(gridTranslatedPosition->Y * CELL_SIZE), (double)(gridTranslatedPosition->Z * CELL_SIZE));
+	const FIntVector* gridTranslatedPosition = new FIntVector((const int)(position.X / CELL_SIZE), (const int)(position.Y / CELL_SIZE), (const int)(position.Z / CELL_SIZE));
 	
 	//UE_LOG(LogTemp, Warning, TEXT("gridTranslatedPosition: %d, %d, %d"), gridTranslatedPosition->X, gridTranslatedPosition->Y, gridTranslatedPosition->Z);
 	//UE_LOG(LogTemp, Warning, TEXT("spawnPositionPosition: %f, %f, %f"), spawnPosition->X, spawnPosition->Y, spawnPosition->Z);
 
-	return std::make_pair(*spawnPosition, GetCellIndex(*gridTranslatedPosition));
+	return GetCellIndexAtSnappedPosition(*gridTranslatedPosition);
 }
 
 bool AWorldController::CheckIfCellFree(const int& cellIndex) {
@@ -87,6 +90,11 @@ AWaterCell* AWorldController::GetWaterCellIfPresent(const int& index) {
 void AWorldController::SetCellInTheGrid(AWaterCell* newWaterCell, int cellIndex) {
 	grid3d[cellIndex].waterCell = std::move(newWaterCell);
 	newWaterCell->SetCurrentGridIndex(cellIndex);
+}
+
+const UE::Math::TVector<double>* AWorldController::GetCellPosition(const int& index)
+{
+	return grid3d[index].GetPosition();
 }
 
 void AWorldController::RemoveWaterCellFromTheGrid(const int& index) {
@@ -150,7 +158,7 @@ void AWorldController::BeginPlay()
 void AWorldController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	Gravity();
+	//Gravity();
 }
 
 void AWorldController::Gravity() {

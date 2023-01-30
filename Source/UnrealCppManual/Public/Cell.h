@@ -13,7 +13,7 @@ public:
 	//uniqueptr
 	AWaterCell* waterCell;
 	bool blockCell;
-	void CalculatePosition(const int& index, const int& cell_size, const int& XLeftBound, const int& XRightBound, const int& YLeftBound, const int& YRightBound);
+	void CalculatePosition(const int& index, const int& cell_size, const int& XLeftBound, const int& XRightBound, const int& YLeftBound, const int& YRightBound, const int& ZLeftBound, const int& ZRightBound);
 	const UE::Math::TVector<double>* GetPosition();
 private:
 	const UE::Math::TVector<double>* position;

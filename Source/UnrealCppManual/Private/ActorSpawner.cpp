@@ -18,13 +18,17 @@ AActorSpawner::AActorSpawner()
 void AActorSpawner::SpawnActor()
 {
 	FVector SpawnerLocation = mainCameraPawn->StaticMeshComp->GetComponentLocation();
-	auto[cellPosition, cellIndex] = worldController->GetCellIndexAndNewPosition(SpawnerLocation);
+	int cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
 
 	if (worldController->CheckIfCellFree(cellIndex))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Water cell spawned! Cell index: %d "), cellIndex);
 		FRotator SpawnRotation = FRotator3d();
-		AWaterCell* newWaterCell = GetWorld()->SpawnActor<AWaterCell>(cellPosition, SpawnRotation);
+		UE_LOG(LogTemp, Warning, TEXT("Spawn Position %f, %f, %f "), SpawnerLocation.X, SpawnerLocation.Y, SpawnerLocation.Z);
+		UE_LOG(LogTemp, Warning, TEXT("Cell Position %f, %f, %f "), worldController->GetCellPosition(cellIndex)->X, worldController->GetCellPosition(cellIndex)->Y, worldController->GetCellPosition(cellIndex)->Z);
+		FVector fv = (FVector)*worldController->GetCellPosition(cellIndex);
+		UE_LOG(LogTemp, Warning, TEXT("fv: %f, %f, %f "), fv.X, fv.Y, fv.Z);
+		AWaterCell* newWaterCell = GetWorld()->SpawnActor<AWaterCell>((FVector) *worldController->GetCellPosition(cellIndex), SpawnRotation);
 		worldController->SetCellInTheGrid(newWaterCell, cellIndex);
 	}
 	else

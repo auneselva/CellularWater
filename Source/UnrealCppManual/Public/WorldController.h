@@ -16,6 +16,14 @@ public:
 	// Sets default values for this actor's properties
 	AWorldController();
 	~AWorldController();
+
+	// Called every frame
+	int GetCellIndexAtFloatPosition(const FVector& position);
+	bool CheckIfCellFree(const int& cellIndex);
+	void SetCellInTheGrid(AWaterCell* newWaterCell, int cellIndex);
+	const UE::Math::TVector<double>* GetCellPosition(const int& index);
+	void RemoveWaterCellFromTheGrid(const int& index);
+	virtual void Tick(float DeltaTime) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -41,7 +49,8 @@ private:
 	bool CheckIfCellWIthinBounds(const int& index);
 	bool CheckIfBlockCell(const int& index);
 	AWaterCell* GetWaterCellIfPresent(const int& index);
-	int GetCellIndex(const FIntVector& cellPosition);
+	int GetCellIndexAtSnappedPosition(const FIntVector& cellPosition);
+	const FIntVector* TranslateCellCoordinatesToLocal(const FIntVector& cellPosition);
 	FVector* GetCellPositionFromIndex(int index);
 	int GetXCoordFromCellIndex(int index);
 	int GetYCoordFromCellIndex(int index);
@@ -55,12 +64,6 @@ private:
 	int GetBottomNeighborIndex(const int& index);
 	void Gravity();
 	void UpdateWaterCellPosition(const int& index);
-public:	
-	// Called every frame
-	std::pair<FVector, int> GetCellIndexAndNewPosition(const FVector& position);
-	bool CheckIfCellFree(const int& cellIndex);
-	void SetCellInTheGrid(AWaterCell* newWaterCell, int cellIndex);
-	void RemoveWaterCellFromTheGrid(const int& index);
-	virtual void Tick(float DeltaTime) override;
+
 
 };
