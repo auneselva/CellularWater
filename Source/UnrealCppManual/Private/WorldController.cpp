@@ -3,9 +3,12 @@
 #include "WorldController.h"
 #include "WaterCell.h"
 #include "Cell.h"
+
 #define BOUND 7
 #define N_CELLS (BOUND + BOUND) * (BOUND + BOUND) * (BOUND + BOUND)
 #define CELL_SIZE 100.0
+#define SIMULATION_SPEED 30.0
+#define GRAVITY_SPEED SIMULATION_SPEED
 
 // Sets default values
 AWorldController::AWorldController()
@@ -143,7 +146,7 @@ int AWorldController::GetLeftNeighborIndex(const int& index) {
 }
 
 int AWorldController::GetBottomNeighborIndex(const int& index) {
-	int resultIndex = index + (XRightBound - XLeftBound) * (YRightBound - YLeftBound);
+	int resultIndex = index - (XRightBound - XLeftBound) * (YRightBound - YLeftBound);
 	return resultIndex;
 }
 
@@ -151,6 +154,7 @@ int AWorldController::GetBottomNeighborIndex(const int& index) {
 void AWorldController::BeginPlay()
 {
 	Super::BeginPlay();
+	gameTimeElapsed = 0;
 	//GetWorldTimerManager().SetTimer(MemberTimerHandle, this, Gravity, 1.0f, true, 2.0f);
 }
 
@@ -158,7 +162,9 @@ void AWorldController::BeginPlay()
 void AWorldController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//Gravity();
+	gameTimeElapsed += DeltaTime;
+	if (((int) (gameTimeElapsed * SIMULATION_SPEED)) % 2 == 0)
+		Gravity();
 }
 
 void AWorldController::Gravity() {
@@ -166,12 +172,17 @@ void AWorldController::Gravity() {
 		if (GetWaterCellIfPresent(i) != nullptr) {
 			int bottomIndex = GetBottomNeighborIndex(i);
 			if (CheckIfCellFree(bottomIndex)) {
-				SetCellInTheGrid(grid3d[i].waterCell, bottomIndex);
-				UpdateWaterCellPosition(bottomIndex);
+				MoveTheWaterCell(i, bottomIndex);
 				UE_LOG(LogTemp, Warning, TEXT("Previous WaterCell: %d"), grid3d[i].waterCell);
 			}
 		}
 	}
+}
+
+void AWorldController::MoveTheWaterCell(const int& fromIndex, const int& toIndex) {
+	SetCellInTheGrid(grid3d[fromIndex].waterCell, toIndex);
+	RemoveWaterCellFromTheGrid(fromIndex);
+	UpdateWaterCellPosition(toIndex);
 }
 
 void AWorldController::UpdateWaterCellPosition(const int& index) {

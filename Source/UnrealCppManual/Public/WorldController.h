@@ -43,7 +43,7 @@ private:
 	// z: [ZLeftBound, ZRightBound - 1]
 
 	Cell* grid3d;
-
+	float gameTimeElapsed;
 	
 	bool CheckIfInBoundaries(const int& x, const int& y, const int& z);
 	bool CheckIfCellWIthinBounds(const int& index);
@@ -64,6 +64,5 @@ private:
 	int GetBottomNeighborIndex(const int& index);
 	void Gravity();
 	void UpdateWaterCellPosition(const int& index);
-
-
+	void MoveTheWaterCell(const int& fromIndex, const int& toIndex);
 };
