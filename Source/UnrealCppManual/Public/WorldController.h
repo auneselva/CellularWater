@@ -18,7 +18,7 @@ public:
 	~AWorldController();
 
 	// Called every frame
-	int GetCellIndexAtFloatPosition(const FVector& position);
+	int GetCellIndexAtFloatPosition(std::shared_ptr<FVector> position);
 	bool CheckIfCellFree(const int& cellIndex);
 	void SetCellInTheGrid(AWaterCell* newWaterCell, int cellIndex);
 	const UE::Math::TVector<double>* GetCellPosition(const int& index);
@@ -49,8 +49,8 @@ private:
 	bool CheckIfCellWIthinBounds(const int& index);
 	bool CheckIfBlockCell(const int& index);
 	AWaterCell* GetWaterCellIfPresent(const int& index);
-	int GetCellIndexAtSnappedPosition(const FIntVector& cellPosition);
-	const FIntVector* TranslateCellCoordinatesToLocal(const FIntVector& cellPosition);
+	int GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> cellPosition);
+	const std::unique_ptr<FIntVector> TranslateCellCoordinatesToLocal(std::unique_ptr<FIntVector> cellPosition);
 	FVector* GetCellPositionFromIndex(int index);
 	int GetXCoordFromCellIndex(int index);
 	int GetYCoordFromCellIndex(int index);

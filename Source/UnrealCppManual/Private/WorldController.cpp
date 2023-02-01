@@ -32,18 +32,18 @@ AWorldController::~AWorldController()
 	delete[] grid3d;
 }
 
-int AWorldController::GetCellIndexAtSnappedPosition(const FIntVector& cellPosition) {
-	if (!CheckIfInBoundaries(cellPosition.X, cellPosition.Y, cellPosition.Z))
+int AWorldController::GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> cellPosition) {
+	if (!CheckIfInBoundaries(cellPosition->X, cellPosition->Y, cellPosition->Z))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Trying to spawn out of borders!"));
 		return -1;
 	}
-	const FIntVector* localCoordinates = TranslateCellCoordinatesToLocal(cellPosition);
+	const std::unique_ptr<FIntVector> localCoordinates = TranslateCellCoordinatesToLocal(std::move(cellPosition));
 	return localCoordinates->X + (XRightBound - XLeftBound) * localCoordinates->Y + (XRightBound - XLeftBound) * (YRightBound - YLeftBound) * localCoordinates->Z;
 }
-const FIntVector* AWorldController::TranslateCellCoordinatesToLocal(const FIntVector& cellPosition) {
+const std::unique_ptr<FIntVector> AWorldController::TranslateCellCoordinatesToLocal(std::unique_ptr<FIntVector> cellPosition) {
 
-	return std::move(new FIntVector(cellPosition.X - XLeftBound, cellPosition.Y - YLeftBound, cellPosition.Z - ZLeftBound));
+	return std::make_unique<FIntVector>(cellPosition->X - XLeftBound, cellPosition->Y - YLeftBound, cellPosition->Z - ZLeftBound);
 }
 
 bool AWorldController::CheckIfInBoundaries(const int& x, const int& y, const int& z) {
@@ -56,14 +56,14 @@ bool AWorldController::CheckIfInBoundaries(const int& x, const int& y, const int
 	return true;
 }
 
-int AWorldController::GetCellIndexAtFloatPosition(const FVector& position) {
+int AWorldController::GetCellIndexAtFloatPosition(std::shared_ptr<FVector> position) {
 
-	const FIntVector* gridTranslatedPosition = new FIntVector((const int)(position.X / CELL_SIZE), (const int)(position.Y / CELL_SIZE), (const int)(position.Z / CELL_SIZE));
+	std::unique_ptr<FIntVector> gridTranslatedPosition = std::make_unique<FIntVector>((const int)(position->X / CELL_SIZE), (const int)(position->Y / CELL_SIZE), (const int)(position->Z / CELL_SIZE));
 	
 	//UE_LOG(LogTemp, Warning, TEXT("gridTranslatedPosition: %d, %d, %d"), gridTranslatedPosition->X, gridTranslatedPosition->Y, gridTranslatedPosition->Z);
 	//UE_LOG(LogTemp, Warning, TEXT("spawnPositionPosition: %f, %f, %f"), spawnPosition->X, spawnPosition->Y, spawnPosition->Z);
 
-	return GetCellIndexAtSnappedPosition(*gridTranslatedPosition);
+	return GetCellIndexAtSnappedPosition(std::move(gridTranslatedPosition));
 }
 
 bool AWorldController::CheckIfCellFree(const int& cellIndex) {

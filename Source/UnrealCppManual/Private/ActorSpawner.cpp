@@ -17,14 +17,14 @@ AActorSpawner::AActorSpawner()
 }
 void AActorSpawner::SpawnActor()
 {
-	FVector SpawnerLocation = mainCameraPawn->StaticMeshComp->GetComponentLocation();
+	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(mainCameraPawn->StaticMeshComp->GetComponentLocation());
 	int cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
 
 	if (worldController->CheckIfCellFree(cellIndex))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Water cell spawned! Cell index: %d "), cellIndex);
 		FRotator SpawnRotation = FRotator3d();
-		UE_LOG(LogTemp, Warning, TEXT("Spawn Position %f, %f, %f "), SpawnerLocation.X, SpawnerLocation.Y, SpawnerLocation.Z);
+		UE_LOG(LogTemp, Warning, TEXT("Spawn Position %f, %f, %f "), SpawnerLocation->X, SpawnerLocation->Y, SpawnerLocation->Z);
 		UE_LOG(LogTemp, Warning, TEXT("Cell Position %f, %f, %f "), worldController->GetCellPosition(cellIndex)->X, worldController->GetCellPosition(cellIndex)->Y, worldController->GetCellPosition(cellIndex)->Z);
 		FVector fv = (FVector)*worldController->GetCellPosition(cellIndex);
 		UE_LOG(LogTemp, Warning, TEXT("fv: %f, %f, %f "), fv.X, fv.Y, fv.Z);
