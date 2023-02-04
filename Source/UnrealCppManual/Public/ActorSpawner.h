@@ -15,18 +15,18 @@ public:
     // Sets default values for this actor's properties
     AActorSpawner();
     UPROPERTY(EditAnywhere)
-        ACameraPawn* mainCameraPawn;
-    UPROPERTY(EditAnywhere)
         AWorldController* worldController;
     UFUNCTION()
         void SpawnActor();
+    FVector3d MovementInput;
+    float boostSpeed;
+
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         class UBoxComponent* SpawnVolume;
-
 public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;

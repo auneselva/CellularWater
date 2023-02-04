@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "CameraPawn.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -34,6 +33,7 @@ ACameraPawn::ACameraPawn()
 	SpringArmComp->CameraLagSpeed = 3.0f;
 	boostSpeed = 1.0f;
 	changeCameraLock = false;
+	spawnerAttached = true;
 }
 
 ACameraPawn::~ACameraPawn() {
@@ -106,9 +106,10 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	InputComponent->BindAction("ZoomIn", IE_Released, this, &ACameraPawn::ZoomOut);
 
 	//Hook up every-frame handling for our four axes
-	InputComponent->BindAxis("MoveForward", this, &ACameraPawn::MoveForward);
-	InputComponent->BindAxis("MoveRight", this, &ACameraPawn::MoveRight);
-	InputComponent->BindAxis("MoveUp", this, &ACameraPawn::MoveUp);
+	InputComponent->BindAxis("MoveForwardCamera", this, &ACameraPawn::MoveForwardCamera);
+	InputComponent->BindAxis("MoveRightCamera", this, &ACameraPawn::MoveRightCamera);
+	InputComponent->BindAxis("MoveUpCamera", this, &ACameraPawn::MoveUpCamera);
+
 	InputComponent->BindAction("Camera1", IE_Pressed, this, &ACameraPawn::ChangeCameraTo1);
   	InputComponent->BindAction("Camera2", IE_Pressed, this, &ACameraPawn::ChangeCameraTo2);
   	InputComponent->BindAction("Camera3", IE_Pressed, this, &ACameraPawn::ChangeCameraTo3);
@@ -116,24 +117,34 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	InputComponent->BindAxis("CameraPitch", this, &ACameraPawn::PitchCamera);
 	InputComponent->BindAxis("CameraYaw", this, &ACameraPawn::YawCamera);
 
+	InputComponent->BindAxis("MoveForwardSpawner", this, &ACameraPawn::MoveForwardSpawner);
+	InputComponent->BindAxis("MoveRightSpawner", this, &ACameraPawn::MoveRightSpawner);
+	InputComponent->BindAxis("MoveUpSpawner", this, &ACameraPawn::MoveUpSpawner);
+	InputComponent->BindAction("ToggleSpawnerAttachment", IE_Pressed, this, &ACameraPawn::ToggleSpawnerAttachment);
+
 	InputComponent->BindAction("SpawnActor", IE_Pressed, this, &ACameraPawn::SpawnActor);
 	InputComponent->BindAction("DestroyActor", IE_Pressed, this, &ACameraPawn::DestroyActor);
 
 }
 
 //Input functions
-void ACameraPawn::MoveForward(float AxisValue)
-{
+void ACameraPawn::MoveForwardCamera(float AxisValue) {
 	MovementInput.X = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	if (spawnerAttached) {
+		MoveForwardSpawner(AxisValue);
+	}
 }
-
-void ACameraPawn::MoveRight(float AxisValue)
-{
+void ACameraPawn::MoveRightCamera(float AxisValue) {
 	MovementInput.Y = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	if (spawnerAttached) {
+		MoveRightSpawner(AxisValue);
+	}
 }
-void ACameraPawn::MoveUp(float AxisValue)
-{
+void ACameraPawn::MoveUpCamera(float AxisValue) {
 	MovementInput.Z = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	if (spawnerAttached) {
+		MoveUpSpawner(AxisValue);
+	}
 }
 
 void ACameraPawn::ChangeCamera(int camIndex) {
@@ -161,27 +172,38 @@ void ACameraPawn::ChangeCameraTo3() {
 
 void ACameraPawn::BoostSpeed(float AxisValue) {
 	boostSpeed = FMath::Clamp<float>(AxisValue, 1.0f, 3.0f);
+	spawner->boostSpeed = boostSpeed;
 }
 
-void ACameraPawn::PitchCamera(float AxisValue)
-{
+void ACameraPawn::PitchCamera(float AxisValue) {
 	CameraInput.Y = AxisValue;
 }
 
-void ACameraPawn::YawCamera(float AxisValue)
-{
+void ACameraPawn::YawCamera(float AxisValue) {
 	CameraInput.X = AxisValue;
 }
-
-void ACameraPawn::ZoomIn()
-{
+//Input functions
+void ACameraPawn::ZoomIn() {
 	bZoomingIn = true;
 }
 
-void ACameraPawn::ZoomOut()
-{
+void ACameraPawn::ZoomOut() {
 	bZoomingIn = false;
 }
+
+void ACameraPawn::MoveForwardSpawner(float AxisValue) {
+	spawner->MovementInput.X = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+}
+void ACameraPawn::MoveRightSpawner(float AxisValue) {
+	spawner->MovementInput.Y = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+}
+void ACameraPawn::MoveUpSpawner(float AxisValue) {
+	spawner->MovementInput.Z = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+}
+void ACameraPawn::ToggleSpawnerAttachment() {
+	spawnerAttached = !spawnerAttached;
+}
+
 void ACameraPawn::SpawnActor() {
 	//Find the Actor Spawner in the world, and invoke it's Spawn Actor function
 	AActor* ActorSpawnerTofind = UGameplayStatics::GetActorOfClass(GetWorld(), AActorSpawner::StaticClass());

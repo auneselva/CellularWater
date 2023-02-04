@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "CameraPawn.generated.h"
+#include "ActorSpawner.h"
 
 UCLASS()
 class UNREALCPPMANUAL_API ACameraPawn : public APawn
@@ -30,7 +31,6 @@ protected:
 	FVector2D CameraInput;
 	float ZoomFactor;
 	bool bZoomingIn;
-
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -39,10 +39,13 @@ private:
 		int cameraID;
 	UPROPERTY(EditAnywhere)
 		ACameraPawn* Cameras[3];
+	UPROPERTY(EditAnywhere)
+		AActorSpawner* spawner;
 	bool changeCameraLock;
-	void MoveForward(float AxisValue);
-	void MoveRight(float AxisValue);
-	void MoveUp(float AxisValue);
+	bool spawnerAttached;
+	void MoveForwardCamera(float AxisValue);
+	void MoveRightCamera(float AxisValue);
+	void MoveUpCamera(float AxisValue);
 	void ChangeCamera(int camIndex);
 	void ChangeCameraTo1();
 	void ChangeCameraTo2();
@@ -52,7 +55,10 @@ private:
 	void YawCamera(float AxisValue);
 	void ZoomIn();
 	void ZoomOut();
-
+	void MoveForwardSpawner(float AxisValue);
+	void MoveRightSpawner(float AxisValue);
+	void MoveUpSpawner(float AxisValue);
+	void ToggleSpawnerAttachment();
 	void SpawnActor();
 	void DestroyActor();
 
