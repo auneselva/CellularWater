@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "CameraPawn.generated.h"
 #include "ActorSpawner.h"
+#include "CameraPawn.generated.h"
 
 UCLASS()
 class UNREALCPPMANUAL_API ACameraPawn : public APawn
