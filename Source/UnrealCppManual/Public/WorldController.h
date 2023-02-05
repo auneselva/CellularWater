@@ -20,7 +20,8 @@ public:
 	// Called every frame
 	int GetCellIndexAtFloatPosition(std::shared_ptr<FVector> position);
 	bool CheckIfCellFree(const int& cellIndex);
-	void SetCellInTheGrid(AWaterCell* newWaterCell, int cellIndex);
+	void SetWaterCubeInTheGrid(AWaterCell* newWaterCell, int cellIndex);
+	void SetBlockCubeInTheGrid(int cellIndex);
 	const UE::Math::TVector<double>* GetCellPosition(const int& index);
 	void RemoveWaterCellFromTheGrid(const int& index);
 	virtual void Tick(float DeltaTime) override;

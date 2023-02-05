@@ -17,7 +17,9 @@ public:
     UPROPERTY(EditAnywhere)
         AWorldController* worldController;
     UFUNCTION()
-        void SpawnActor();
+        void SpawnWaterCube();
+    UFUNCTION()
+        void SpawnBlockCube();
     UPROPERTY(EditAnywhere)
         AActor* spawner;
 

@@ -7,7 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ActorSpawner.h"
 #include "WaterCell.h"
-
+#include "BlockCube.h"
 // Sets default values
 
 ACameraPawn::ACameraPawn()
@@ -151,7 +151,8 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	InputComponent->BindAxis("MoveUpSpawner", this, &ACameraPawn::MoveUpSpawner);
 	InputComponent->BindAction("ToggleSpawnerAttachment", IE_Pressed, this, &ACameraPawn::ToggleSpawnerAttachment);
 
-	InputComponent->BindAction("SpawnActor", IE_Pressed, this, &ACameraPawn::SpawnActor);
+	InputComponent->BindAction("SpawnWaterCube", IE_Pressed, this, &ACameraPawn::SpawnWaterCube);
+	InputComponent->BindAction("SpawnBlockCube", IE_Pressed, this, &ACameraPawn::SpawnBlockCube);
 	InputComponent->BindAction("DestroyActor", IE_Pressed, this, &ACameraPawn::DestroyActor);
 
 }
@@ -240,16 +241,27 @@ void ACameraPawn::ToggleSpawnerAttachment() {
 	spawnerAttached = !spawnerAttached;
 }
 
-void ACameraPawn::SpawnActor() {
+void ACameraPawn::SpawnWaterCube() {
 	//Find the Actor Spawner in the world, and invoke it's Spawn Actor function
 	AActor* ActorSpawnerTofind = UGameplayStatics::GetActorOfClass(GetWorld(), AActorSpawner::StaticClass());
 
 	AActorSpawner* ActorSpawnerReference = Cast<AActorSpawner>(ActorSpawnerTofind);
 	if (ActorSpawnerReference)
 	{
-		ActorSpawnerReference->SpawnActor();
+		ActorSpawnerReference->SpawnWaterCube();
 	}
 }
+void ACameraPawn::SpawnBlockCube() {
+	//Find the Actor Spawner in the world, and invoke it's Spawn Actor function
+	AActor* ActorSpawnerTofind = UGameplayStatics::GetActorOfClass(GetWorld(), AActorSpawner::StaticClass());
+
+	AActorSpawner* ActorSpawnerReference = Cast<AActorSpawner>(ActorSpawnerTofind);
+	if (ActorSpawnerReference)
+	{
+		ActorSpawnerReference->SpawnBlockCube();
+	}
+}
+
 void ACameraPawn::DestroyActor() {
 	//Get every Actor to Spawn in the world and invoke Destroy Actor
 	TArray<AActor*> FoundActors;

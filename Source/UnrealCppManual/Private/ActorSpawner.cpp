@@ -4,6 +4,7 @@
 #include "ActorSpawner.h"
 #include "Components/BoxComponent.h"
 #include "WaterCell.h"
+#include "BlockCube.h"
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -16,7 +17,8 @@ AActorSpawner::AActorSpawner()
 
 	SpawnVolume->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
-void AActorSpawner::SpawnActor()
+
+void AActorSpawner::SpawnWaterCube()
 {
 	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(spawner->GetActorLocation());
 	int cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
@@ -29,13 +31,30 @@ void AActorSpawner::SpawnActor()
 		UE_LOG(LogTemp, Warning, TEXT("Cell Position %f, %f, %f "), worldController->GetCellPosition(cellIndex)->X, worldController->GetCellPosition(cellIndex)->Y, worldController->GetCellPosition(cellIndex)->Z);
 		FVector fv = (FVector)*worldController->GetCellPosition(cellIndex);
 		UE_LOG(LogTemp, Warning, TEXT("fv: %f, %f, %f "), fv.X, fv.Y, fv.Z);
-		AWaterCell* newWaterCell = GetWorld()->SpawnActor<AWaterCell>((FVector) *worldController->GetCellPosition(cellIndex), SpawnRotation);
-		worldController->SetCellInTheGrid(newWaterCell, cellIndex);
+		AWaterCell* newCube = GetWorld()->SpawnActor<AWaterCell>((FVector) *worldController->GetCellPosition(cellIndex), SpawnRotation);
+		worldController->SetWaterCubeInTheGrid(newCube, cellIndex);
+
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("Not spawned! Cell index: %d "), cellIndex);
 }
 
+void AActorSpawner::SpawnBlockCube()
+{
+	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(spawner->GetActorLocation());
+	int cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
+
+	if (worldController->CheckIfCellFree(cellIndex))
+	{
+		FRotator SpawnRotation = FRotator3d();
+		FVector fv = (FVector)*worldController->GetCellPosition(cellIndex);
+
+		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*worldController->GetCellPosition(cellIndex), SpawnRotation);
+		worldController->SetBlockCubeInTheGrid(cellIndex);
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("Not spawned! Cell index: %d "), cellIndex);
+}
 // Called when the game starts or when spawned
 void AActorSpawner::BeginPlay()
 {

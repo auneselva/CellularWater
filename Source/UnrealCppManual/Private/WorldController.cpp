@@ -90,11 +90,13 @@ AWaterCell* AWorldController::GetWaterCellIfPresent(const int& index) {
 	return grid3d[index].waterCell;
 }
 
-void AWorldController::SetCellInTheGrid(AWaterCell* newWaterCell, int cellIndex) {
+void AWorldController::SetWaterCubeInTheGrid(AWaterCell* newWaterCell, int cellIndex) {
 	grid3d[cellIndex].waterCell = std::move(newWaterCell);
 	newWaterCell->SetCurrentGridIndex(cellIndex);
 }
-
+void AWorldController::SetBlockCubeInTheGrid(int cellIndex) {
+	grid3d[cellIndex].blockCell = true;
+}
 const UE::Math::TVector<double>* AWorldController::GetCellPosition(const int& index)
 {
 	return grid3d[index].GetPosition();
@@ -180,7 +182,7 @@ void AWorldController::Gravity() {
 }
 
 void AWorldController::MoveTheWaterCell(const int& fromIndex, const int& toIndex) {
-	SetCellInTheGrid(grid3d[fromIndex].waterCell, toIndex);
+	SetWaterCubeInTheGrid(grid3d[fromIndex].waterCell, toIndex);
 	RemoveWaterCellFromTheGrid(fromIndex);
 	UpdateWaterCellPosition(toIndex);
 }
