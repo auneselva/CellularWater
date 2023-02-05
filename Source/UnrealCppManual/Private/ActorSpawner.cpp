@@ -15,11 +15,10 @@ AActorSpawner::AActorSpawner()
 	SpawnVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnVolume"));
 
 	SpawnVolume->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	boostSpeed = 1.0f;
 }
 void AActorSpawner::SpawnActor()
 {
-	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(GetActorLocation());
+	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(spawner->GetActorLocation());
 	int cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
 
 	if (worldController->CheckIfCellFree(cellIndex))
@@ -48,22 +47,6 @@ void AActorSpawner::BeginPlay()
 void AActorSpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	{
-		FRotator NewRotation = controller->GetPawn()->GetActorRotation();
-		SetActorRotation(NewRotation);
-	}
-	{
-		if (!MovementInput.IsZero())
-		{
-			//Scale our movement input axis values by 100 units per second
-			MovementInput = MovementInput.GetSafeNormal() * 200.0f * boostSpeed;
-			FVector NewLocation = GetActorLocation();
-			NewLocation += GetActorForwardVector() * MovementInput.X * DeltaTime;
-			NewLocation += GetActorRightVector() * MovementInput.Y * DeltaTime;
-			NewLocation += GetActorUpVector() * MovementInput.Z * DeltaTime;
-			SetActorLocation(NewLocation);
-		}
-	}
+
 }
 

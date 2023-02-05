@@ -68,7 +68,7 @@ int AWorldController::GetCellIndexAtFloatPosition(std::shared_ptr<FVector> posit
 
 bool AWorldController::CheckIfCellFree(const int& cellIndex) {
 	if (!CheckIfCellWIthinBounds(cellIndex)) {
-		UE_LOG(LogTemp, Warning, TEXT("Cell index %d out of bounds! Something went wrong!"), cellIndex);
+		//UE_LOG(LogTemp, Warning, TEXT("Cell index %d out of bounds! Something went wrong!"), cellIndex);
 		return false;
 	}
 	if (CheckIfBlockCell(cellIndex))

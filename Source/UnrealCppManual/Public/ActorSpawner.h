@@ -18,8 +18,8 @@ public:
         AWorldController* worldController;
     UFUNCTION()
         void SpawnActor();
-    FVector3d MovementInput;
-    float boostSpeed;
+    UPROPERTY(EditAnywhere)
+        AActor* spawner;
 
 protected:
     // Called when the game starts or when spawned

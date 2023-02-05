@@ -32,6 +32,7 @@ ACameraPawn::ACameraPawn()
 	SpringArmComp->bEnableCameraLag = true;
 	SpringArmComp->CameraLagSpeed = 3.0f;
 	boostSpeed = 1.0f;
+	boostSpeedSpawner = 1.0f;
 	changeCameraLock = false;
 	spawnerAttached = true;
 }
@@ -51,9 +52,38 @@ void ACameraPawn::BeginPlay()
 // Called every frame
 void ACameraPawn::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+	UpdateCameraPawnTransform(DeltaTime);
+	UpdateSpawnerTransform(DeltaTime);
+}
+
+
+void ACameraPawn::UpdateSpawnerTransform(const float& DeltaTime) {
 	APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (controller->GetPawn() == Cameras[cameraID]) {
-		Super::Tick(DeltaTime);
+			{
+				FRotator NewRotation = controller->GetPawn()->GetActorRotation();
+				spawner->SetActorRotation(NewRotation);
+			}
+			{
+				if (!MovementInputSpawner.IsZero())
+				{
+					//Scale our movement input axis values by 100 units per second
+					MovementInputSpawner = MovementInputSpawner.GetSafeNormal() * 200.0f * boostSpeedSpawner;
+					FVector NewLocation = spawner->GetActorLocation();
+					NewLocation += spawner->GetActorForwardVector() * MovementInputSpawner.X * DeltaTime;
+					NewLocation += spawner->GetActorRightVector() * MovementInputSpawner.Y * DeltaTime;
+					NewLocation += spawner->GetActorUpVector() * MovementInputSpawner.Z * DeltaTime;
+					spawner->SetActorLocation(NewLocation);
+					UE_LOG(LogTemp, Warning, TEXT("Spawner NewLocation: %f, %f, %f"), NewLocation.X, NewLocation.Y, NewLocation.Z);
+				}
+			}
+		}
+}
+
+void ACameraPawn::UpdateCameraPawnTransform(const float& DeltaTime) {
+	APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (controller->GetPawn() == Cameras[cameraID]) {
 		{
 			if (bZoomingIn)
 			{
@@ -96,7 +126,6 @@ void ACameraPawn::Tick(float DeltaTime)
 		}
 	}
 }
-
 // Called to bind functionality to input
 void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -131,19 +160,19 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void ACameraPawn::MoveForwardCamera(float AxisValue) {
 	MovementInput.X = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
 	if (spawnerAttached) {
-		MoveForwardSpawner(AxisValue);
+		MovementInputSpawner.X = MovementInput.X;
 	}
 }
 void ACameraPawn::MoveRightCamera(float AxisValue) {
 	MovementInput.Y = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
 	if (spawnerAttached) {
-		MoveRightSpawner(AxisValue);
+		MovementInputSpawner.Y = MovementInput.Y;
 	}
 }
 void ACameraPawn::MoveUpCamera(float AxisValue) {
 	MovementInput.Z = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
 	if (spawnerAttached) {
-		MoveUpSpawner(AxisValue);
+		MovementInputSpawner.Z = MovementInput.Z;
 	}
 }
 
@@ -172,7 +201,7 @@ void ACameraPawn::ChangeCameraTo3() {
 
 void ACameraPawn::BoostSpeed(float AxisValue) {
 	boostSpeed = FMath::Clamp<float>(AxisValue, 1.0f, 3.0f);
-	spawner->boostSpeed = boostSpeed;
+	boostSpeedSpawner = boostSpeed;
 }
 
 void ACameraPawn::PitchCamera(float AxisValue) {
@@ -192,15 +221,22 @@ void ACameraPawn::ZoomOut() {
 }
 
 void ACameraPawn::MoveForwardSpawner(float AxisValue) {
-	spawner->MovementInput.X = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	if (!spawnerAttached) {
+		MovementInputSpawner.X = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	}
 }
 void ACameraPawn::MoveRightSpawner(float AxisValue) {
-	spawner->MovementInput.Y = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	if (!spawnerAttached) {
+		MovementInputSpawner.Y = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	}
 }
 void ACameraPawn::MoveUpSpawner(float AxisValue) {
-	spawner->MovementInput.Z = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	if (!spawnerAttached) {
+		MovementInputSpawner.Z = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	}
 }
 void ACameraPawn::ToggleSpawnerAttachment() {
+	UE_LOG(LogTemp, Warning, TEXT("Attachment toggled to %d"), spawnerAttached)
 	spawnerAttached = !spawnerAttached;
 }
 

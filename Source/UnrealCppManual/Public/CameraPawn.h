@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "ActorSpawner.h"
 #include "CameraPawn.generated.h"
 
 UCLASS()
@@ -28,6 +27,8 @@ protected:
 
 	FVector3d MovementInput;
 	float boostSpeed;
+	FVector3d MovementInputSpawner;
+	float boostSpeedSpawner;
 	FVector2D CameraInput;
 	float ZoomFactor;
 	bool bZoomingIn;
@@ -40,9 +41,11 @@ private:
 	UPROPERTY(EditAnywhere)
 		ACameraPawn* Cameras[3];
 	UPROPERTY(EditAnywhere)
-		AActorSpawner* spawner;
+		AActor* spawner;
+
 	bool changeCameraLock;
 	bool spawnerAttached;
+
 	void MoveForwardCamera(float AxisValue);
 	void MoveRightCamera(float AxisValue);
 	void MoveUpCamera(float AxisValue);
@@ -55,12 +58,16 @@ private:
 	void YawCamera(float AxisValue);
 	void ZoomIn();
 	void ZoomOut();
+
 	void MoveForwardSpawner(float AxisValue);
 	void MoveRightSpawner(float AxisValue);
 	void MoveUpSpawner(float AxisValue);
 	void ToggleSpawnerAttachment();
 	void SpawnActor();
 	void DestroyActor();
+
+	void UpdateCameraPawnTransform(const float& DeltaTime);
+	void UpdateSpawnerTransform(const float& DeltaTime);
 
 public:	
 	// Called every frame
