@@ -6,7 +6,7 @@
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include "Kismet/GameplayStatics.h"
 #include "ActorSpawner.h"
-#include "WaterCell.h"
+#include "WaterCube.h"
 #include "BlockCube.h"
 // Sets default values
 
@@ -262,7 +262,7 @@ void ACameraPawn::SpawnBlockCube() {
 void ACameraPawn::DestroyActor() {
 	//Get every Actor to Spawn in the world and invoke Destroy Actor
 	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWaterCell::StaticClass(), FoundActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWaterCube::StaticClass(), FoundActors);
 	for (AActor* ActorFound : FoundActors)
 	{
 		ActorFound->Destroy();

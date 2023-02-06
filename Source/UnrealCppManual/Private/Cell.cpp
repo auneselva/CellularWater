@@ -2,15 +2,15 @@
 
 
 #include "Cell.h"
-#include "WaterCell.h"
+#include "WaterCube.h"
 /*
 Cell::Cell()
 {
-	waterCell = false;
+	WaterCube = false;
 	blockCell = false;
 }
 */
-Cell::Cell() : waterCell(nullptr), blockCell(false)
+Cell::Cell() : WaterCube(nullptr), blockCell(false)
 {
 } 
 

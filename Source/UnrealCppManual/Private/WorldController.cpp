@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "WorldController.h"
-#include "WaterCell.h"
+#include "WaterCube.h"
 #include "Cell.h"
 
 #define BOUND 7
@@ -24,7 +24,7 @@ AWorldController::AWorldController()
 	for (int i = 0; i < N_CELLS; i++)
 		grid3d[i].CalculatePosition(i, CELL_SIZE, XLeftBound, XRightBound, YLeftBound, YRightBound, ZLeftBound, ZRightBound);
 
-	//UE_LOG(LogTemp, Warning, TEXT("Grid3d %d"), grid3d[7999].waterCell );
+	//UE_LOG(LogTemp, Warning, TEXT("Grid3d %d"), grid3d[7999].WaterCube );
 
 }
 AWorldController::~AWorldController()
@@ -72,7 +72,7 @@ bool AWorldController::CheckIfCellFree(const int& cellIndex) {
 	}
 	if (CheckIfBlockCell(cellIndex))
 		return false;
-	if (GetWaterCellIfPresent(cellIndex) != nullptr)
+	if (GetWaterCubeIfPresent(cellIndex) != nullptr)
 		return false;
 	return true;
 }
@@ -85,13 +85,13 @@ bool AWorldController::CheckIfBlockCell(const int& index) {
 	return grid3d[index].blockCell;
 }
 
-AWaterCell* AWorldController::GetWaterCellIfPresent(const int& index) {
-	return grid3d[index].waterCell;
+AWaterCube* AWorldController::GetWaterCubeIfPresent(const int& index) {
+	return grid3d[index].WaterCube;
 }
 
-void AWorldController::SetWaterCubeInTheGrid(AWaterCell* newWaterCell, int cellIndex) {
-	grid3d[cellIndex].waterCell = std::move(newWaterCell);
-	newWaterCell->SetCurrentGridIndex(cellIndex);
+void AWorldController::SetWaterCubeInTheGrid(AWaterCube* newWaterCube, int cellIndex) {
+	grid3d[cellIndex].WaterCube = std::move(newWaterCube);
+	newWaterCube->SetCurrentGridIndex(cellIndex);
 }
 void AWorldController::SetBlockCubeInTheGrid(int cellIndex) {
 	grid3d[cellIndex].blockCell = true;
@@ -101,8 +101,8 @@ const UE::Math::TVector<double>* AWorldController::GetCellPosition(const int& in
 	return grid3d[index].GetPosition();
 }
 
-void AWorldController::RemoveWaterCellFromTheGrid(const int& index) {
-	grid3d[index].waterCell = nullptr;
+void AWorldController::RemoveWaterCubeFromTheGrid(const int& index) {
+	grid3d[index].WaterCube = nullptr;
 }
 
 int AWorldController::GetTopNeighborIndex(const int& index) {
@@ -170,23 +170,23 @@ void AWorldController::Tick(float DeltaTime)
 
 void AWorldController::Gravity() {
 	for (int i = 0; i < N_CELLS; i++) {
-		if (GetWaterCellIfPresent(i) != nullptr) {
+		if (GetWaterCubeIfPresent(i) != nullptr) {
 			int bottomIndex = GetBottomNeighborIndex(i);
 			if (CheckIfCellFree(bottomIndex)) {
-				MoveTheWaterCell(i, bottomIndex);
+				MoveTheWaterCube(i, bottomIndex);
 			}
 		}
 	}
 }
 
-void AWorldController::MoveTheWaterCell(const int& fromIndex, const int& toIndex) {
-	SetWaterCubeInTheGrid(grid3d[fromIndex].waterCell, toIndex);
-	RemoveWaterCellFromTheGrid(fromIndex);
-	UpdateWaterCellPosition(toIndex);
+void AWorldController::MoveTheWaterCube(const int& fromIndex, const int& toIndex) {
+	SetWaterCubeInTheGrid(grid3d[fromIndex].WaterCube, toIndex);
+	RemoveWaterCubeFromTheGrid(fromIndex);
+	UpdateWaterCubePosition(toIndex);
 }
 
-void AWorldController::UpdateWaterCellPosition(const int& index) {
+void AWorldController::UpdateWaterCubePosition(const int& index) {
 
-	grid3d[index].waterCell->SetActorLocation(*grid3d[index].GetPosition());
+	grid3d[index].WaterCube->SetActorLocation(*grid3d[index].GetPosition());
 }
 

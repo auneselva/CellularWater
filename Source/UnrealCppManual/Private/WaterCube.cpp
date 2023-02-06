@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "WaterCell.h"
+#include "WaterCube.h"
 #include <algorithm>
 #include <string>
 // Sets default values
-AWaterCell::AWaterCell()
+AWaterCube::AWaterCube()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -23,18 +23,18 @@ AWaterCell::AWaterCell()
 
 }
 
-AWaterCell::~AWaterCell() {
+AWaterCube::~AWaterCube() {
 	delete color;
 }
 
-void AWaterCell::SetCurrentGridIndex(const int& index) {
+void AWaterCube::SetCurrentGridIndex(const int& index) {
 	currentCellIndex = index;
 }
-int AWaterCell::GetCurrentGridIndex() {
+int AWaterCube::GetCurrentGridIndex() {
 	return currentCellIndex;
 }
 // Called when the game starts or when spawned
-void AWaterCell::BeginPlay()
+void AWaterCube::BeginPlay()
 {
 	Super::BeginPlay();
 	colorRaising = true;
@@ -43,7 +43,7 @@ void AWaterCell::BeginPlay()
 	VisualMesh->SetMaterial(0, material);
 }
 
-void AWaterCell::ChangeColorInTime(const float &delta) {
+void AWaterCube::ChangeColorInTime(const float &delta) {
 	if (color->R < 0.01f && !colorRaising)
 		colorRaising = true;
 	else if (color->R > 0.99f && colorRaising)
@@ -62,7 +62,7 @@ void AWaterCell::ChangeColorInTime(const float &delta) {
 }
 
 // Called every frame
-void AWaterCell::Tick(float DeltaTime)
+void AWaterCube::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//FVector NewLocation = GetActorLocation();

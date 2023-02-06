@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "WaterCell.generated.h"
+#include "WaterCube.generated.h"
 
 UCLASS()
-class UNREALCPPMANUAL_API AWaterCell : public AActor
+class UNREALCPPMANUAL_API AWaterCube : public AActor
 {
 	GENERATED_BODY()
 	UPROPERTY(VisibleAnywhere)
@@ -20,8 +20,8 @@ private:
 	void ChangeColorInTime(const float &delta);
 public:	
 	// Sets default values for this actor's properties
-	AWaterCell();
-	~AWaterCell();
+	AWaterCube();
+	~AWaterCube();
 
 	void SetCurrentGridIndex(const int& index);
 	int GetCurrentGridIndex();

@@ -3,7 +3,7 @@
 
 #include "ActorSpawner.h"
 #include "Components/BoxComponent.h"
-#include "WaterCell.h"
+#include "WaterCube.h"
 #include "BlockCube.h"
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
@@ -27,7 +27,7 @@ void AActorSpawner::SpawnWaterCube()
 	{
 		FRotator SpawnRotation = FRotator3d();
 		FVector fv = (FVector)*worldController->GetCellPosition(cellIndex);
-		AWaterCell* newCube = GetWorld()->SpawnActor<AWaterCell>((FVector) *worldController->GetCellPosition(cellIndex), SpawnRotation);
+		AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector) *worldController->GetCellPosition(cellIndex), SpawnRotation);
 		worldController->SetWaterCubeInTheGrid(newCube, cellIndex);
 	}
 }

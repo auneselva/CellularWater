@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WaterCell.h"
+#include "WaterCube.h"
 
 class UNREALCPPMANUAL_API Cell
 {
@@ -11,7 +11,7 @@ public:
 	Cell();
 	~Cell();
 	//uniqueptr
-	AWaterCell* waterCell;
+	AWaterCube* WaterCube;
 	bool blockCell;
 	void CalculatePosition(const int& index, const int& cell_size, const int& XLeftBound, const int& XRightBound, const int& YLeftBound, const int& YRightBound, const int& ZLeftBound, const int& ZRightBound);
 	const UE::Math::TVector<double>* GetPosition();
