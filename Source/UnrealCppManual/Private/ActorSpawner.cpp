@@ -25,18 +25,11 @@ void AActorSpawner::SpawnWaterCube()
 
 	if (worldController->CheckIfCellFree(cellIndex))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Water cell spawned! Cell index: %d "), cellIndex);
 		FRotator SpawnRotation = FRotator3d();
-		UE_LOG(LogTemp, Warning, TEXT("Spawn Position %f, %f, %f "), SpawnerLocation->X, SpawnerLocation->Y, SpawnerLocation->Z);
-		UE_LOG(LogTemp, Warning, TEXT("Cell Position %f, %f, %f "), worldController->GetCellPosition(cellIndex)->X, worldController->GetCellPosition(cellIndex)->Y, worldController->GetCellPosition(cellIndex)->Z);
 		FVector fv = (FVector)*worldController->GetCellPosition(cellIndex);
-		UE_LOG(LogTemp, Warning, TEXT("fv: %f, %f, %f "), fv.X, fv.Y, fv.Z);
 		AWaterCell* newCube = GetWorld()->SpawnActor<AWaterCell>((FVector) *worldController->GetCellPosition(cellIndex), SpawnRotation);
 		worldController->SetWaterCubeInTheGrid(newCube, cellIndex);
-
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("Not spawned! Cell index: %d "), cellIndex);
 }
 
 void AActorSpawner::SpawnBlockCube()
@@ -52,8 +45,6 @@ void AActorSpawner::SpawnBlockCube()
 		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*worldController->GetCellPosition(cellIndex), SpawnRotation);
 		worldController->SetBlockCubeInTheGrid(cellIndex);
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("Not spawned! Cell index: %d "), cellIndex);
 }
 // Called when the game starts or when spawned
 void AActorSpawner::BeginPlay()

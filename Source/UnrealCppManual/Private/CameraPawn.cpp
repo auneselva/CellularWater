@@ -75,7 +75,6 @@ void ACameraPawn::UpdateSpawnerTransform(const float& DeltaTime) {
 					NewLocation += spawner->GetActorRightVector() * MovementInputSpawner.Y * DeltaTime;
 					NewLocation += spawner->GetActorUpVector() * MovementInputSpawner.Z * DeltaTime;
 					spawner->SetActorLocation(NewLocation);
-					UE_LOG(LogTemp, Warning, TEXT("Spawner NewLocation: %f, %f, %f"), NewLocation.X, NewLocation.Y, NewLocation.Z);
 				}
 			}
 		}
@@ -181,7 +180,6 @@ void ACameraPawn::ChangeCamera(int camIndex) {
 
 	APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (controller->GetPawn() != Cameras[camIndex]) {
-		UE_LOG(LogTemp, Warning, TEXT("Camera should be changed now to %d"), cameraID)
 		controller->UnPossess();
 		controller->Possess(Cameras[camIndex]);
 	}
@@ -237,7 +235,6 @@ void ACameraPawn::MoveUpSpawner(float AxisValue) {
 	}
 }
 void ACameraPawn::ToggleSpawnerAttachment() {
-	UE_LOG(LogTemp, Warning, TEXT("Attachment toggled to %d"), spawnerAttached)
 	spawnerAttached = !spawnerAttached;
 }
 

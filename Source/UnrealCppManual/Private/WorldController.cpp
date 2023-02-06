@@ -35,7 +35,6 @@ AWorldController::~AWorldController()
 int AWorldController::GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> cellPosition) {
 	if (!CheckIfInBoundaries(cellPosition->X, cellPosition->Y, cellPosition->Z))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Trying to spawn out of borders!"));
 		return -1;
 	}
 	const std::unique_ptr<FIntVector> localCoordinates = TranslateCellCoordinatesToLocal(std::move(cellPosition));
@@ -175,7 +174,6 @@ void AWorldController::Gravity() {
 			int bottomIndex = GetBottomNeighborIndex(i);
 			if (CheckIfCellFree(bottomIndex)) {
 				MoveTheWaterCell(i, bottomIndex);
-				UE_LOG(LogTemp, Warning, TEXT("Previous WaterCell: %d"), grid3d[i].waterCell);
 			}
 		}
 	}
