@@ -20,11 +20,13 @@ public:
 	// Called every frame
 	int GetCellIndexAtFloatPosition(std::shared_ptr<FVector> position);
 	bool CheckIfCellFree(const int& cellIndex);
-	void SetWaterCubeInTheGrid(AWaterCube* newWaterCube, int cellIndex);
+	void SetWaterCubeInTheGrid(AWaterCube* newWaterCube, const int& cellIndex);
 	void SetBlockCubeInTheGrid(int cellIndex);
 	const UE::Math::TVector<double>* GetCellPosition(const int& index);
-	void RemoveWaterCubeFromTheGrid(const int& index);
+	void DetachWaterCubeFromTheCell(const int& index);
+	void DestroyWaterCubeActor(const int& index);
 	virtual void Tick(float DeltaTime) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -50,6 +52,12 @@ private:
 	bool CheckIfCellWIthinBounds(const int& index);
 	bool CheckIfBlockCell(const int& index);
 	AWaterCube* GetWaterCubeIfPresent(const int& index);
+	float& GetCurrentWaterLevel(const int& index);
+	void SetNextIterationWaterLevel(const int& index, const float& waterLevel);
+	void SetWaterLevel(const int& index, const float& waterLevel);
+	float& GetWaterSpilt(const int& index);
+	void AddWaterSpilt(const int& index, const float& amount);
+	void SetWaterSpilt(const int& index, const float& amount);
 	int GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> cellPosition);
 	const std::unique_ptr<FIntVector> TranslateCellCoordinatesToLocal(std::unique_ptr<FIntVector> cellPosition);
 	FVector* GetCellPositionFromIndex(int index);
@@ -63,7 +71,12 @@ private:
 	int GetBehindNeighborIndex(const int& index);
 	int GetLeftNeighborIndex(const int& index);
 	int GetBottomNeighborIndex(const int& index);
-	void Gravity();
 	void UpdateWaterCubePosition(const int& index);
 	void MoveTheWaterCube(const int& fromIndex, const int& toIndex);
+	void Gravity(const int& index);
+	void SpillAround(const int& index);
+	bool IsNeighbourFreeToBeSpilledTo(const int& currentIndex, const int& neighbourIndex);
+	void HandleSpiltWater();
+	void SpreadOverwateredCell(const int& index);
+	void ApplySimulationProccesses();
 };

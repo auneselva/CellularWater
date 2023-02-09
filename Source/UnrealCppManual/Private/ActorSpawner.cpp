@@ -21,13 +21,11 @@ AActorSpawner::AActorSpawner()
 void AActorSpawner::SpawnWaterCube()
 {
 	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(spawner->GetActorLocation());
-	int cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
+	const int& cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
 
 	if (worldController->CheckIfCellFree(cellIndex))
 	{
-		FRotator SpawnRotation = FRotator3d();
-		FVector fv = (FVector)*worldController->GetCellPosition(cellIndex);
-		AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector) *worldController->GetCellPosition(cellIndex), SpawnRotation);
+		AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector) *worldController->GetCellPosition(cellIndex), FRotator3d());
 		worldController->SetWaterCubeInTheGrid(newCube, cellIndex);
 	}
 }
@@ -35,14 +33,11 @@ void AActorSpawner::SpawnWaterCube()
 void AActorSpawner::SpawnBlockCube()
 {
 	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(spawner->GetActorLocation());
-	int cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
+	const int& cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
 
 	if (worldController->CheckIfCellFree(cellIndex))
 	{
-		FRotator SpawnRotation = FRotator3d();
-		FVector fv = (FVector)*worldController->GetCellPosition(cellIndex);
-
-		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*worldController->GetCellPosition(cellIndex), SpawnRotation);
+		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*worldController->GetCellPosition(cellIndex), FRotator3d());
 		worldController->SetBlockCubeInTheGrid(cellIndex);
 	}
 }

@@ -10,7 +10,7 @@ Cell::Cell()
 	blockCell = false;
 }
 */
-Cell::Cell() : WaterCube(nullptr), blockCell(false)
+Cell::Cell() : WaterCube(nullptr), blockCell(false), nextIterationWaterLevel(0.0f), currentWaterLevel(0.0f), waterSpilt(0.0f)
 {
 } 
 
@@ -33,6 +33,7 @@ void Cell::CalculatePosition(const int &index, const int &cell_size, const int& 
 const UE::Math::TVector<double> * Cell::GetPosition() {
 	return position;
 }
+
 
 Cell::~Cell()
 {
