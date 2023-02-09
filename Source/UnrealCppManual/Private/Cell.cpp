@@ -14,6 +14,11 @@ Cell::Cell() : WaterCube(nullptr), blockCell(false), nextIterationWaterLevel(0.0
 {
 } 
 
+
+Cell::~Cell()
+{
+}
+
 void Cell::CalculatePosition(const int &index, const int &cell_size, const int& XLeftBound, const int& XRightBound, const int& YLeftBound, const int& YRightBound, const int& ZLeftBound, const int& ZRightBound) {
 	int xSize = (XRightBound - XLeftBound);
 	int ySize = (YRightBound - YLeftBound);
@@ -33,8 +38,12 @@ void Cell::CalculatePosition(const int &index, const int &cell_size, const int& 
 const UE::Math::TVector<double> * Cell::GetPosition() {
 	return position;
 }
-
-
-Cell::~Cell()
-{
+void Cell::AdjustWaterCubesTransformIfPresent(const int& cell_size) {
+	if (WaterCube != nullptr) {
+		float level = currentWaterLevel;
+		FVector currentScale = WaterCube->GetActorScale();
+		WaterCube->SetActorScale3D(FVector(currentScale.X, currentScale.Y, level * 1.0f));
+		UE::Math::TVector<double> offset = UE::Math::TVector<double>(0.0f, 0.0f, - ((double) (cell_size)) * (double)level);
+		WaterCube->SetActorLocation(*position - offset);
+	}
 }

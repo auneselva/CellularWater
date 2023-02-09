@@ -18,6 +18,7 @@ public:
 	float waterSpilt;
 	void CalculatePosition(const int& index, const int& cell_size, const int& XLeftBound, const int& XRightBound, const int& YLeftBound, const int& YRightBound, const int& ZLeftBound, const int& ZRightBound);
 	const UE::Math::TVector<double>* GetPosition();
+	void AdjustWaterCubesTransformIfPresent(const int& cell_size);
 
 private:
 	const UE::Math::TVector<double>* position;

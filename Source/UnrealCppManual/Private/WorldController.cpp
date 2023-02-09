@@ -221,6 +221,7 @@ void AWorldController::ApplySimulationProccesses() {
 			//SpillAround(i);
 		}
 	}
+	HandleSpiltWater();
 }
 
 void AWorldController::SpillAround(const int& index) {
@@ -268,21 +269,23 @@ bool AWorldController::IsNeighbourFreeToBeSpilledTo(const int& currentIndex, con
 
 void AWorldController::HandleSpiltWater() { //or handle pressure?
 	for (int i = 0; i < N_CELLS; i++) {
-		float summedWaterInCell = GetWaterSpilt(i) + GetCurrentWaterLevel(i);
-		if (summedWaterInCell < 0.01f) {
-			DestroyWaterCubeActor(i);
-			SetNextIterationWaterLevel(i, 0.0f);
-		}
-		else if (summedWaterInCell >= 0.01f) {
-			if (GetWaterCubeIfPresent(i) == nullptr) {
-				AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*GetCellPosition(i), FRotator3d());
-				SetWaterCubeInTheGrid(newCube, i);
-				SetNextIterationWaterLevel(i, summedWaterInCell);
+		if (!CheckIfBlockCell(i)) {
+			float summedWaterInCell = GetWaterSpilt(i) + GetCurrentWaterLevel(i);
+			if (summedWaterInCell < 0.01f) {
+				DestroyWaterCubeActor(i);
+				SetNextIterationWaterLevel(i, 0.0f);
 			}
-		}
-		if (summedWaterInCell > 1.0f) { //pressure is too much
-			const int& aboveIndex = GetTopNeighborIndex(i);
-			//SpreadOverwateredCell()
+			else if (summedWaterInCell >= 0.01f) {
+				if (GetWaterCubeIfPresent(i) == nullptr) {
+					AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*GetCellPosition(i), FRotator3d());
+					SetWaterCubeInTheGrid(newCube, i);
+					SetNextIterationWaterLevel(i, summedWaterInCell);
+				}
+			}
+			if (summedWaterInCell > 1.0f) { //pressure is too much
+				const int& aboveIndex = GetTopNeighborIndex(i);
+				//SpreadOverwateredCell()
+			}
 		}
 	}
 }
