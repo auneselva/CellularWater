@@ -22,10 +22,11 @@ public:
 	// Sets default values for this actor's properties
 	AWaterCube();
 	~AWaterCube();
-
+	float currentWaterCapacity;
+	float nextIterationWaterCapacity;
+	bool isCapacityUndetermined;
 	void SetCurrentGridIndex(const int& index);
 	int GetCurrentGridIndex();
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

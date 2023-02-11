@@ -3,14 +3,8 @@
 #include "WorldController.h"
 #include "WaterCube.h"
 #include "Cell.h"
+#include <vector>
 
-#define BOUND 7
-#define N_CELLS (BOUND + BOUND) * (BOUND + BOUND) * (BOUND + BOUND)
-#define CELL_SIZE 100.0
-#define SIMULATION_SPEED 30.0
-#define GRAVITY_SPEED SIMULATION_SPEED
-
-// Sets default values
 AWorldController::AWorldController()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -99,6 +93,11 @@ void AWorldController::SetWaterLevel(const int& index, const float& waterLevel) 
 	grid3d[index].currentWaterLevel = waterLevel;
 }
 
+bool AWorldController::CheckIfFullCapacityReached(const int& index, const float& level) {
+	if (GetCurrentWaterLevel(index) > GetWaterCapacity(index) - 0.01f)
+		return false;
+	return true;
+}
 float& AWorldController::GetWaterSpilt(const int& index) {
 	return grid3d[index].waterSpilt;
 }
@@ -108,6 +107,10 @@ void AWorldController::AddWaterSpilt(const int& index, const float& amount) {
 }
 void AWorldController::SetWaterSpilt(const int& index, const float& amount) {
 	grid3d[index].waterSpilt = amount;
+}
+
+float AWorldController::GetWaterCapacity(const int& index) {
+	return grid3d[index].WaterCube->currentWaterCapacity;
 }
 
 void AWorldController::SetWaterCubeInTheGrid(AWaterCube* newWaterCube, const int& cellIndex) {
@@ -218,10 +221,11 @@ void AWorldController::ApplySimulationProccesses() {
 	for (int i = 0; i < N_CELLS; i++) {
 		if (GetWaterCubeIfPresent(i) != nullptr) {
 			Gravity(i);
-			//SpillAround(i);
+			SpillAround(i);
 		}
 	}
 	HandleSpiltWater();
+	CalculateWaterCubeCapacity();
 }
 
 void AWorldController::SpillAround(const int& index) {
@@ -252,7 +256,6 @@ void AWorldController::SpillAround(const int& index) {
 			AddWaterSpilt(i, waterAmountForEachNeighbour);
 		AddWaterSpilt(index, -waterAmountForEachNeighbour * (float)(sideNeighbours.size()));
 	}
-
 }
 bool AWorldController::IsNeighbourFreeToBeSpilledTo(const int& currentIndex, const int& neighbourIndex) {
 	if (CheckIfCellWIthinBounds(neighbourIndex)) {
@@ -282,11 +285,148 @@ void AWorldController::HandleSpiltWater() { //or handle pressure?
 					SetNextIterationWaterLevel(i, summedWaterInCell);
 				}
 			}
-			if (summedWaterInCell > 1.0f) { //pressure is too much
-				const int& aboveIndex = GetTopNeighborIndex(i);
-				//SpreadOverwateredCell()
-			}
 		}
 	}
 }
+
+void AWorldController::CalculateWaterCubeCapacity() {
+	std::vector<int> indicesOfUnknownCapacity;
+
+	for (int i = 0; i < N_CELLS; i++) {
+
+		grid3d[i].WaterCube->nextIterationWaterCapacity = BASE_CAPACITY;
+
+		if (GetWaterCubeIfPresent(i) == nullptr)
+			continue;
+		float& currentLevel = GetCurrentWaterLevel(i);
+
+		if (!CheckIfFullCapacityReached(i, currentLevel))
+			continue;
+
+		std::vector<int> indicesInZStack;
+		indicesInZStack.reserve(ZRightBound - ZLeftBound);
+		indicesInZStack.emplace_back(i);
+
+		int topIndex = GetTopNeighborIndex(i);
+		if (!CheckIfCellWIthinBounds(topIndex))
+			continue;
+		bool checkingUpwards = true;
+		bool blockAbove = false;
+		while (checkingUpwards) {
+
+			if (!CheckIfCellWIthinBounds(topIndex)) {
+				checkingUpwards = false;
+			}
+			if (!CheckIfBlockCell(topIndex)) { 
+				currentLevel = GetCurrentWaterLevel(topIndex);
+				indicesInZStack.emplace_back(i);
+				if (CheckIfFullCapacityReached(topIndex, currentLevel)) {
+					grid3d[i].WaterCube->nextIterationWaterCapacity += EXCEED_MODIFIER;
+					topIndex = GetTopNeighborIndex(i);
+				}
+				else
+				{
+					grid3d[i].WaterCube->nextIterationWaterCapacity += EXCEED_MODIFIER;
+					checkingUpwards = false;
+				}
+			}
+			else {
+				blockAbove = true;
+				checkingUpwards = false;
+			}
+		}
+
+		if (blockAbove) {
+			for (int& idx : indicesInZStack) {
+				grid3d[idx].WaterCube->isCapacityUndetermined = true;
+				indicesOfUnknownCapacity.emplace_back(idx);
+
+			}
+		}
+		else {
+			for (int& idx : indicesInZStack)
+				grid3d[idx].WaterCube->isCapacityUndetermined = false;
+		}
+		indicesInZStack.clear();
+
+	}
+
+	std::vector<int> toRemove;
+	toRemove.reserve(indicesOfUnknownCapacity.size());
+	while (!indicesOfUnknownCapacity.empty()) {
+
+		for (int& idx : indicesOfUnknownCapacity) {
+
+			if (SetNeighbourWaterCapacityIfPresent(idx))
+				toRemove.emplace_back(idx);
+		}
+		if (toRemove.empty())
+			return;
+
+		while (!toRemove.empty()) {
+			int idx = toRemove.back();
+			toRemove.pop_back();
+#pragma warning(suppress : 4834)
+			std::remove(indicesOfUnknownCapacity.begin(), indicesOfUnknownCapacity.end(), idx);
+		}
+	}
+
+
+}
+
+bool AWorldController::SetNeighbourWaterCapacityIfPresent(const int& index) {
+	float highestCapacity = 0.0f;
+	bool isWaterAround = false;
+	const int& leftIndex = GetLeftNeighborIndex(index);
+	GetHigherCapacity(highestCapacity, leftIndex, isWaterAround);
+	const int& frontIndex = GetFrontNeighborIndex(index);
+	GetHigherCapacity(highestCapacity, frontIndex, isWaterAround);
+	const int& rightIndex = GetRightNeighborIndex(index);
+	GetHigherCapacity(highestCapacity, rightIndex, isWaterAround);
+	const int& behindIndex = GetBehindNeighborIndex(index);
+	GetHigherCapacity(highestCapacity, behindIndex, isWaterAround);
+	if (highestCapacity > BASE_CAPACITY - PRECISION_OFFSET) {
+		grid3d[index].WaterCube->nextIterationWaterCapacity = highestCapacity;
+		grid3d[index].WaterCube->isCapacityUndetermined = false;
+		return true;
+	}
+	if (!isWaterAround) {
+		grid3d[index].WaterCube->nextIterationWaterCapacity = BASE_CAPACITY;
+		grid3d[index].WaterCube->isCapacityUndetermined = false;
+		return true;
+	}
+	return false;
+}
+
+void AWorldController::GetHigherCapacity(float& currCapacity, const int& index, bool& isWaterAround) {
+	if (!CheckIfCellWIthinBounds(index)) {
+		return;
+	}
+
+	AWaterCube* waterCube = GetWaterCubeIfPresent(index);
+	if (waterCube == nullptr)
+		return;
+	isWaterAround = true;
+
+	if (waterCube->isCapacityUndetermined)
+		return;
+
+	if (waterCube->nextIterationWaterCapacity > currCapacity)
+		currCapacity = waterCube->nextIterationWaterCapacity;
+}
+
+void AWorldController::ApplyCalculatedCapacities() {
+	for (int i = 0; i < N_CELLS; i++) {
+		AWaterCube* waterCube = grid3d[i].WaterCube;
+		if (waterCube != nullptr) {
+			waterCube->currentWaterCapacity = waterCube->nextIterationWaterCapacity;
+			waterCube->nextIterationWaterCapacity = BASE_CAPACITY;
+		}
+	}
+}
+
+void AWorldController::DetermineWaterFlow() {
+
+}
+
 

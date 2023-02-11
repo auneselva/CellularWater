@@ -7,11 +7,20 @@
 #include "Cell.h"
 #include "WorldController.generated.h"
 
+#define BOUND 7
+#define N_CELLS (BOUND + BOUND) * (BOUND + BOUND) * (BOUND + BOUND)
+#define CELL_SIZE 100.0
+#define SIMULATION_SPEED 30.0
+#define GRAVITY_SPEED SIMULATION_SPEED
+#define BASE_CAPACITY 1.0f
+#define EXCEED_MODIFIER 0.02f
+#define PRECISION_OFFSET 0.01f
+
 UCLASS()
 class UNREALCPPMANUAL_API AWorldController : public AActor
 {
 	GENERATED_BODY()
-	
+
 public:	
 	// Sets default values for this actor's properties
 	AWorldController();
@@ -55,9 +64,12 @@ private:
 	float& GetCurrentWaterLevel(const int& index);
 	void SetNextIterationWaterLevel(const int& index, const float& waterLevel);
 	void SetWaterLevel(const int& index, const float& waterLevel);
+	bool CheckIfFullCapacityReached(const int& index, const float& level);
+	bool SetNeighbourWaterCapacityIfPresent(const int& index);
 	float& GetWaterSpilt(const int& index);
 	void AddWaterSpilt(const int& index, const float& amount);
 	void SetWaterSpilt(const int& index, const float& amount);
+	float GetWaterCapacity(const int& index);
 	int GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> cellPosition);
 	const std::unique_ptr<FIntVector> TranslateCellCoordinatesToLocal(std::unique_ptr<FIntVector> cellPosition);
 	FVector* GetCellPositionFromIndex(int index);
@@ -73,10 +85,16 @@ private:
 	int GetBottomNeighborIndex(const int& index);
 	void UpdateWaterCubePosition(const int& index);
 	void MoveTheWaterCube(const int& fromIndex, const int& toIndex);
+#pragma region Physics
 	void Gravity(const int& index);
 	void SpillAround(const int& index);
 	bool IsNeighbourFreeToBeSpilledTo(const int& currentIndex, const int& neighbourIndex);
 	void HandleSpiltWater();
 	void SpreadOverwateredCell(const int& index);
 	void ApplySimulationProccesses();
+	void CalculateWaterCubeCapacity();
+	void GetHigherCapacity(float& currCapacity, const int& index, bool& isWaterAround);
+	void ApplyCalculatedCapacities();
+	void DetermineWaterFlow();
+#pragma endregion Physics
 };
