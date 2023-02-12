@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "WaterCube.generated.h"
 
+enum class PressureDirection {None, Up, Down, Front, Behind, Right, Left};
+
 UCLASS()
 class UNREALCPPMANUAL_API AWaterCube : public AActor
 {
@@ -25,6 +27,9 @@ public:
 	float currentWaterCapacity;
 	float nextIterationWaterCapacity;
 	bool isCapacityUndetermined;
+	float flowStrength;
+	PressureDirection currDir;
+
 	void SetCurrentGridIndex(const int& index);
 	int GetCurrentGridIndex();
 protected:

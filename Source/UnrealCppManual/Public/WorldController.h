@@ -14,7 +14,8 @@
 #define GRAVITY_SPEED SIMULATION_SPEED
 #define BASE_CAPACITY 1.0f
 #define EXCEED_MODIFIER 0.02f
-#define PRECISION_OFFSET 0.01f
+#define PRECISION_OFFSET 0.005f
+#define MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD 0.2f
 
 UCLASS()
 class UNREALCPPMANUAL_API AWorldController : public AActor
@@ -31,6 +32,7 @@ public:
 	bool CheckIfCellFree(const int& cellIndex);
 	void SetWaterCubeInTheGrid(AWaterCube* newWaterCube, const int& cellIndex);
 	void SetBlockCubeInTheGrid(int cellIndex);
+	void SetWaterLevel(const int& index, const float& waterLevel);
 	const UE::Math::TVector<double>* GetCellPosition(const int& index);
 	void DetachWaterCubeFromTheCell(const int& index);
 	void DestroyWaterCubeActor(const int& index);
@@ -63,8 +65,8 @@ private:
 	AWaterCube* GetWaterCubeIfPresent(const int& index);
 	float& GetCurrentWaterLevel(const int& index);
 	void SetNextIterationWaterLevel(const int& index, const float& waterLevel);
-	void SetWaterLevel(const int& index, const float& waterLevel);
 	bool CheckIfFullCapacityReached(const int& index, const float& level);
+	float CalculateWaterOverload(const int& index);
 	bool SetNeighbourWaterCapacityIfPresent(const int& index);
 	float& GetWaterSpilt(const int& index);
 	void AddWaterSpilt(const int& index, const float& amount);
@@ -90,11 +92,14 @@ private:
 	void SpillAround(const int& index);
 	bool IsNeighbourFreeToBeSpilledTo(const int& currentIndex, const int& neighbourIndex);
 	void HandleSpiltWater();
+	void ApplyNextIterWaterToCurrent();
 	void SpreadOverwateredCell(const int& index);
 	void ApplySimulationProccesses();
 	void CalculateWaterCubeCapacity();
 	void GetHigherCapacity(float& currCapacity, const int& index, bool& isWaterAround);
 	void ApplyCalculatedCapacities();
 	void DetermineWaterFlow();
+	void EvaluateFlowFromNeighbours(const int& index);
+	float GetWaterOverloadInCell(const int& index);
 #pragma endregion Physics
 };

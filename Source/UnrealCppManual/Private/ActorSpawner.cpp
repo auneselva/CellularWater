@@ -27,6 +27,7 @@ void AActorSpawner::SpawnWaterCube()
 	{
 		AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector) *worldController->GetCellPosition(cellIndex), FRotator3d());
 		worldController->SetWaterCubeInTheGrid(newCube, cellIndex);
+		worldController->SetWaterLevel(cellIndex, 1.0f);
 	}
 }
 
