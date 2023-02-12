@@ -6,7 +6,7 @@
 #include <string>
 #include <WorldController.h>
 // Sets default values
-AWaterCube::AWaterCube(): currentWaterCapacity(BASE_CAPACITY), nextIterationWaterCapacity(BASE_CAPACITY), isCapacityUndetermined(false), flowStrength(0.0f), currDir(PressureDirection::None)
+AWaterCube::AWaterCube(): currentWaterCapacity(BASE_CAPACITY), nextIterationWaterCapacity(BASE_CAPACITY), isCapacityUndetermined(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;

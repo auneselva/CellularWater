@@ -446,12 +446,7 @@ void AWorldController::DetermineWaterFlow() {
 		AWaterCube* waterCube = grid3d[i].WaterCube;
 		if (waterCube != nullptr) {
 			const float& currentLevel = GetCurrentWaterLevel(i);
-			if (!CheckIfFullCapacityReached(i, currentLevel)) {
-				waterCube->flowStrength = 0.0f;
-				waterCube->currDir = PressureDirection::None;
-			}
-			else
-			{
+			if (CheckIfFullCapacityReached(i, currentLevel)) {
 				EvaluateFlowFromNeighbours(i);
 			}
 
