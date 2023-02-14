@@ -14,6 +14,7 @@ class UNREALCPPMANUAL_API AActorSpawner: public AActor
 public:
     // Sets default values for this actor's properties
     AActorSpawner();
+    ~AActorSpawner();
     UPROPERTY(EditAnywhere)
         AWorldController* worldController;
     UFUNCTION()
@@ -22,7 +23,7 @@ public:
         void SpawnBlockCube();
     UPROPERTY(EditAnywhere)
         AActor* spawner;
-
+    FRotator3d* defaultRotation;
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;

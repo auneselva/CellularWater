@@ -7,15 +7,15 @@
 #include "Cell.h"
 #include "WorldController.generated.h"
 
-#define BOUND 7
+#define BOUND 10
 #define N_CELLS (BOUND + BOUND) * (BOUND + BOUND) * (BOUND + BOUND)
 #define CELL_SIZE 100.0
-#define SIMULATION_SPEED 30.0
+#define SIMULATION_SPEED 1.0
 #define GRAVITY_SPEED SIMULATION_SPEED
-#define BASE_CAPACITY 1.0f
-#define EXCEED_MODIFIER 0.02f
-#define PRECISION_OFFSET 0.005f
-#define MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD 0.2f
+#define BASE_CAPACITY 1.0
+#define EXCEED_MODIFIER 0.02
+#define PRECISION_OFFSET 0.01
+#define MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD 0.2
 
 UCLASS()
 class UNREALCPPMANUAL_API AWorldController : public AActor
@@ -26,7 +26,7 @@ public:
 	// Sets default values for this actor's properties
 	AWorldController();
 	~AWorldController();
-
+	FRotator3d* defaultRotation;
 	// Called every frame
 	int GetCellIndexAtFloatPosition(std::shared_ptr<FVector> position);
 	bool CheckIfCellFree(const int& cellIndex);
@@ -63,12 +63,12 @@ private:
 	bool CheckIfCellWIthinBounds(const int& index);
 	bool CheckIfBlockCell(const int& index);
 	AWaterCube* GetWaterCubeIfPresent(const int& index);
-	float& GetCurrentWaterLevel(const int& index);
+	float GetCurrentWaterLevel(const int& index);
 	void SetNextIterationWaterLevel(const int& index, const float& waterLevel);
 	bool CheckIfFullCapacityReached(const int& index, const float& level);
 	float CalculateWaterOverload(const int& index);
 	bool SetNeighbourWaterCapacityIfPresent(const int& index);
-	float& GetWaterSpilt(const int& index);
+	float GetWaterSpilt(const int& index);
 	void AddWaterSpilt(const int& index, const float& amount);
 	void SetWaterSpilt(const int& index, const float& amount);
 	float GetWaterCapacity(const int& index);
@@ -91,6 +91,7 @@ private:
 	void Gravity(const int& index);
 	void SpillAround(const int& index);
 	bool IsNeighbourFreeToBeSpilledTo(const int& currentIndex, const int& neighbourIndex);
+	bool CanWaterFallDown(const int& currentIndex);
 	void HandleSpiltWater();
 	void ApplyNextIterWaterToCurrent();
 	void SpreadOverwateredCell(const int& index);

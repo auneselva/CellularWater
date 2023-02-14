@@ -16,8 +16,11 @@ AActorSpawner::AActorSpawner()
 	SpawnVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnVolume"));
 
 	SpawnVolume->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	defaultRotation = new FRotator3d();
 }
-
+AActorSpawner::~AActorSpawner() {
+	delete defaultRotation;
+}
 void AActorSpawner::SpawnWaterCube()
 {
 	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(spawner->GetActorLocation());
@@ -25,7 +28,7 @@ void AActorSpawner::SpawnWaterCube()
 
 	if (worldController->CheckIfCellFree(cellIndex))
 	{
-		AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector) *worldController->GetCellPosition(cellIndex), FRotator3d());
+		AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector) *worldController->GetCellPosition(cellIndex), *defaultRotation);
 		worldController->SetWaterCubeInTheGrid(newCube, cellIndex);
 		worldController->SetWaterLevel(cellIndex, 1.0f);
 	}
