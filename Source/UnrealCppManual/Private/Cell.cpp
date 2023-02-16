@@ -41,9 +41,10 @@ const UE::Math::TVector<double> * Cell::GetPosition() {
 void Cell::AdjustWaterCubesTransformIfPresent(const int& cell_size) {
 	if (WaterCube != nullptr) {
 		float level = currentWaterLevel;
-		FVector currentScale = WaterCube->GetActorScale();
-		WaterCube->SetActorScale3D(FVector(currentScale.X, currentScale.Y, level * 1.0f));
-		UE::Math::TVector<double> offset = UE::Math::TVector<double>(0.0f, 0.0f, - ((double) (cell_size)) * (double)level);
-		WaterCube->SetActorLocation(*position - offset);
+		UE_LOG(LogTemp, Warning, TEXT("i: %d, cell_size: %f, Current Water level: %f, offset: %f"), WaterCube->GetCurrentGridIndex(), (double)cell_size , level, (double)cell_size / 2.0 * (level - 1.0));
+		WaterCube->SetActorScale3D(FVector(1.0, 1.0, level * 1.0));
+		//UE::Math::TVector<double> offset = UE::Math::TVector<double>(0.0, 0.0, ((double)(cell_size)) / 5.0 *(level - 1.0));
+
+		WaterCube->SetActorLocation(*position);
 	}
 }

@@ -16,6 +16,11 @@ AWorldController::AWorldController()
 	YRightBound = BOUND;
 	ZLeftBound = -BOUND;
 	ZRightBound = BOUND;
+	xNCells = XRightBound - XLeftBound;
+	yNCells = YRightBound - YLeftBound;
+	zNCells = ZRightBound - ZLeftBound;
+	xyNCells = (XRightBound - XLeftBound) * (YRightBound - YLeftBound);
+
 	grid3d = new Cell[N_CELLS];
 	for (int i = 0; i < N_CELLS; i++)
 		grid3d[i].CalculatePosition(i, CELL_SIZE, XLeftBound, XRightBound, YLeftBound, YRightBound, ZLeftBound, ZRightBound);
@@ -35,7 +40,7 @@ int AWorldController::GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> 
 		return -1;
 	}
 	const std::unique_ptr<FIntVector> localCoordinates = TranslateCellCoordinatesToLocal(std::move(cellPosition));
-	return localCoordinates->X + (XRightBound - XLeftBound) * localCoordinates->Y + (XRightBound - XLeftBound) * (YRightBound - YLeftBound) * localCoordinates->Z;
+	return localCoordinates->X + xNCells * localCoordinates->Y + xyNCells * localCoordinates->Z;
 }
 const std::unique_ptr<FIntVector> AWorldController::TranslateCellCoordinatesToLocal(std::unique_ptr<FIntVector> cellPosition) {
 
@@ -98,8 +103,8 @@ void AWorldController::SetWaterLevel(const int& index, const float& waterLevel) 
 
 bool AWorldController::CheckIfFullCapacityReached(const int& index, const float& level) {
 	if (level > GetWaterCapacity(index) - PRECISION_OFFSET)
-		return false;
-	return true;
+		return true;
+	return false;
 }
 
 float AWorldController::CalculateWaterOverload(const int& index) {
@@ -143,47 +148,43 @@ void AWorldController::DetachWaterCubeFromTheCell(const int& index) {
 	grid3d[index].WaterCube = nullptr;
 }
 int AWorldController::GetTopNeighborIndex(const int& index) {
-	int resultIndex = index + (XRightBound - XLeftBound) * (YRightBound - YLeftBound);
+	int resultIndex = index + xyNCells;
 	return resultIndex;
 }
 
 int AWorldController::GetFrontNeighborIndex(const int& index) {
-	int NZCells = (XRightBound - XLeftBound) * (YRightBound - YLeftBound);
-	int resultIndex = index + (XRightBound - XLeftBound);
+	int resultIndex = index + xNCells;
 	// if outside bounds return -1 to let us know it is a blocking cell
-	if (resultIndex / NZCells > index / NZCells)
+	if (resultIndex / xyNCells > index / xyNCells)
 		return -1;
 	return resultIndex;
 }
 
 int AWorldController::GetRightNeighborIndex(const int& index) {
-	int NXCells = (YRightBound - YLeftBound);
 	int resultIndex = index - 1;
 	// if outside bounds return -1 to let us know it is a blocking cell
-	if (resultIndex / NXCells < index / NXCells)
+	if (resultIndex / yNCells < index / yNCells)
 		return -1;
 	return resultIndex;
 }
 
 int AWorldController::GetBehindNeighborIndex(const int& index) {
-	int NZCells = (XRightBound - XLeftBound) * (YRightBound - YLeftBound);
-	int resultIndex = index - (XRightBound - XLeftBound);
-	if (resultIndex / NZCells < index / NZCells)
+	int resultIndex = index - xNCells;
+	if (resultIndex / xyNCells < index / xyNCells)
 		return -1;
 	return resultIndex;
 }
 
 int AWorldController::GetLeftNeighborIndex(const int& index) {
-	int NXCells = (YRightBound - YLeftBound);
 	int resultIndex = index + 1;
 	// if outside bounds return -1 to let us know it is a blocking cell
-	if (resultIndex / NXCells > index / NXCells)
+	if (resultIndex / yNCells > index / yNCells)
 		return -1;
 	return resultIndex;
 }
 
 int AWorldController::GetBottomNeighborIndex(const int& index) {
-	int resultIndex = index - (XRightBound - XLeftBound) * (YRightBound - YLeftBound);
+	int resultIndex = index - xyNCells;
 	return resultIndex;
 }
 
@@ -222,6 +223,7 @@ void AWorldController::Gravity(const int& index) {
 		int bottomIndex = GetBottomNeighborIndex(index);
 		if (GetWaterCubeIfPresent(bottomIndex) != nullptr) {
 			float waterAmountToBeFlown = GetWaterCapacity(bottomIndex) - GetCurrentWaterLevel(bottomIndex);
+			
 			AddWaterSpilt(bottomIndex, waterAmountToBeFlown);
 			AddWaterSpilt(index, -waterAmountToBeFlown);
 		}
@@ -238,37 +240,37 @@ void AWorldController::ApplySimulationProccesses() {
 			Gravity(i);
 			SpillAround(i);
 		}
+		if (i % xyNCells == xyNCells - 1)
+			HandleSpiltWater(i - xyNCells + 1, i + 1);
 	}
-
+	/*
 	UE_LOG(LogTemp, Warning, TEXT("\n\n\n\n\nWater Splitted"));
 	for (int i = 0; i < N_CELLS; i++) {
 		if (GetWaterSpilt(i) > PRECISION_OFFSET)
 			UE_LOG(LogTemp, Warning, TEXT("%d: %f"), i, GetWaterSpilt(i));
 	}
 
-	HandleSpiltWater();
-
 	UE_LOG(LogTemp, Warning, TEXT("\n\n\n\n\nWater Levels"));
 	for (int i = 0; i < N_CELLS; i++) {
 		if (GetCurrentWaterLevel(i) > PRECISION_OFFSET)
 			UE_LOG(LogTemp, Warning, TEXT("%d: %f"), i, GetCurrentWaterLevel(i))
-	}
+	} */
 	//CalculateWaterCubeCapacity();
 	//ApplyCalculatedCapacities();
 	//DetermineWaterFlow();
-	//HandleSpiltWater();
+	HandleSpiltWater(0, N_CELLS);
 	for (int i = 0; i < N_CELLS; i++)
-		grid3d[i].AdjustWaterCubesTransformIfPresent(CELL_SIZE);	
+		grid3d[i].AdjustWaterCubesTransformIfPresent(CELL_SIZE);
 }
 
 void AWorldController::SpillAround(const int& index) {
 	//only spill water around if the cell below is occupied
 
 	if (!CanWaterFallDown(index)) {
-		UE_LOG(LogTemp, Warning, TEXT("Cannot fall down"));
+		//UE_LOG(LogTemp, Warning, TEXT("Cannot fall down"));
 		std::vector<int> sideNeighbours;
 		sideNeighbours.reserve(4);
-		UE_LOG(LogTemp, Warning, TEXT("Current index: %d"), index);
+		//UE_LOG(LogTemp, Warning, TEXT("Current index: %d"), index);
 		int rightIndex = GetRightNeighborIndex(index);
 
 		if (IsNeighbourFreeToBeSpilledTo(index, rightIndex)) {
@@ -286,12 +288,14 @@ void AWorldController::SpillAround(const int& index) {
 		if (IsNeighbourFreeToBeSpilledTo(index, behindIndex)) {
 			sideNeighbours.emplace_back(behindIndex);
 		}
+		/*
 		UE_LOG(LogTemp, Warning, TEXT("frontIndex: %d"), frontIndex);
 		UE_LOG(LogTemp, Warning, TEXT("behindIndex: %d"), behindIndex);
 		UE_LOG(LogTemp, Warning, TEXT("leftIndex: %d"), leftIndex);
 		UE_LOG(LogTemp, Warning, TEXT("rightIndex: %d"), rightIndex);
+		*/
 		float waterAmountForEachNeighbour = GetCurrentWaterLevel(index) / ((float)(sideNeighbours.size()) + 1.0f);
-		UE_LOG(LogTemp, Warning, TEXT("waterAmountForEachNeighbour: %f"), waterAmountForEachNeighbour);
+		//UE_LOG(LogTemp, Warning, TEXT("waterAmountForEachNeighbour: %f"), waterAmountForEachNeighbour);
 		for (int& i : sideNeighbours)
 			AddWaterSpilt(i, waterAmountForEachNeighbour);
 		AddWaterSpilt(index, -waterAmountForEachNeighbour * (float)(sideNeighbours.size()));
@@ -320,7 +324,7 @@ bool AWorldController::CanWaterFallDown(const int& currentIndex) {
 	}
 	return false;
 }
-void AWorldController::HandleSpiltWater() { //or handle pressure?
+void AWorldController::HandleSpiltWater(int start, int end) { //or handle pressure?
 	for (int i = 0; i < N_CELLS; i++) {
 		if (!CheckIfBlockCell(i)) {
 			float summedWaterInCell = GetWaterSpilt(i) + GetCurrentWaterLevel(i);
@@ -350,7 +354,7 @@ void AWorldController::ApplyNextIterWaterToCurrent() {
 void AWorldController::CalculateWaterCubeCapacity() {
 	std::vector<int> indicesOfUnknownCapacity;
 	std::vector<int> indicesInZStack;
-	indicesInZStack.reserve(ZRightBound - ZLeftBound);
+	indicesInZStack.reserve(zNCells);
 
 	for (int i = 0; i < N_CELLS; i++) {
 		AWaterCube* waterCube = grid3d[i].WaterCube;

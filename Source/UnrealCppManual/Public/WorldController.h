@@ -50,6 +50,11 @@ private:
 	int ZLeftBound; 
 	int ZRightBound;
 
+
+	int xNCells;
+	int yNCells;
+	int zNCells;
+	int xyNCells;
 	// the grid consists of cells that are within 3-dimensional bounds. Those bounds define the piece of space for simulation.
 	// Those boundaries are in the following ranges:
 	// x: [XLeftBound, XRightBound - 1],
@@ -92,7 +97,7 @@ private:
 	void SpillAround(const int& index);
 	bool IsNeighbourFreeToBeSpilledTo(const int& currentIndex, const int& neighbourIndex);
 	bool CanWaterFallDown(const int& currentIndex);
-	void HandleSpiltWater();
+	void HandleSpiltWater(int start, int end);
 	void ApplyNextIterWaterToCurrent();
 	void SpreadOverwateredCell(const int& index);
 	void ApplySimulationProccesses();

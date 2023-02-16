@@ -26,7 +26,6 @@ public:
 	float currentWaterCapacity;
 	float nextIterationWaterCapacity;
 	bool isCapacityUndetermined;
-
 	void SetCurrentGridIndex(const int& index);
 	int GetCurrentGridIndex();
 protected:
