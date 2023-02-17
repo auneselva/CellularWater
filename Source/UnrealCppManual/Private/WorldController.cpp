@@ -185,7 +185,7 @@ int AWorldController::GetBehindNeighborIndex(const int& index) {
 		return -1;
 	return resultIndex;
 }
-int AWorldController::GetBehindLeftBehindNeighborIndex(const int& index) {
+int AWorldController::GetBehindLeftNeighborIndex(const int& index) {
 	int behindIndex = GetBehindNeighborIndex(index);
 	int resultIndex = GetLeftNeighborIndex(behindIndex);
 	return resultIndex;
@@ -312,17 +312,57 @@ void AWorldController::SpillAround(const int& index) {
 		if (IsNeighbourFreeToBeSpilledTo(index, behindIndex)) {
 			sideNeighbours.emplace_back(behindIndex);
 		}
+
+		if (std::find(sideNeighbours.begin(), sideNeighbours.end(), frontIndex) != sideNeighbours.end()) {
+			if (std::find(sideNeighbours.begin(), sideNeighbours.end(), rightIndex) != sideNeighbours.end()) {
+				int frontRightIndex = GetRightNeighborIndex(frontIndex);
+				if (IsNeighbourFreeToBeSpilledTo(index, frontRightIndex))
+					diagonalNeighbours.emplace_back(frontRightIndex);
+			}	
+		}
+
+		if (std::find(sideNeighbours.begin(), sideNeighbours.end(), rightIndex) != sideNeighbours.end()) {
+			if (std::find(sideNeighbours.begin(), sideNeighbours.end(), behindIndex) != sideNeighbours.end()) {
+				int rightBehindIndex = GetBehindNeighborIndex(rightIndex);
+				if (IsNeighbourFreeToBeSpilledTo(index, rightBehindIndex))
+					diagonalNeighbours.emplace_back(rightBehindIndex);
+			}
+		}
+
+		if (std::find(sideNeighbours.begin(), sideNeighbours.end(), behindIndex) != sideNeighbours.end()) {
+			if (std::find(sideNeighbours.begin(), sideNeighbours.end(), leftIndex) != sideNeighbours.end()) {
+				int behindLeftIndex = GetLeftNeighborIndex(behindIndex);
+				if (IsNeighbourFreeToBeSpilledTo(index, behindLeftIndex))
+					diagonalNeighbours.emplace_back(behindLeftIndex);
+			}
+		}
+
+		if (std::find(sideNeighbours.begin(), sideNeighbours.end(), rightIndex) != sideNeighbours.end()) {
+			if (std::find(sideNeighbours.begin(), sideNeighbours.end(), frontIndex) != sideNeighbours.end()) {
+				int frontRightIndex = GetFrontNeighborIndex(rightIndex);
+				if (IsNeighbourFreeToBeSpilledTo(index, frontRightIndex))
+					diagonalNeighbours.emplace_back(frontRightIndex);
+			}
+		}
 		/*
 		UE_LOG(LogTemp, Warning, TEXT("frontIndex: %d"), frontIndex);
 		UE_LOG(LogTemp, Warning, TEXT("behindIndex: %d"), behindIndex);
 		UE_LOG(LogTemp, Warning, TEXT("leftIndex: %d"), leftIndex);
 		UE_LOG(LogTemp, Warning, TEXT("rightIndex: %d"), rightIndex);
 		*/
-		float waterAmountForEachNeighbour = GetCurrentWaterLevel(index) / ((float)(sideNeighbours.size()) + 1.0f);
+		// weightSideNeighbour = 1.0f;
+		// weightDiagNeighbour = 0.5f;
+		// CurrentLevel = (sideNeighbours.size() + 1) * 1.0f * x + diagNeighbours.size() * 0.5f * x
+		// CurrentLevel = x ( (sideneighbours.size() + 1) + diagNeighbours.size * 0.5)
+		// x = CurrentLevel/ ( (sideneighbours.size() + 1) + diagNeighbours.size * 0.5)
+		float diagWeight = 0.5f;
+		float waterAmountForEachNeighbour = std::clamp(GetCurrentWaterLevel(index) / ((float)(sideNeighbours.size()) + 1.0f + (float)diagonalNeighbours.size() * diagWeight), 0.0f, 0.2f);
 		//UE_LOG(LogTemp, Warning, TEXT("waterAmountForEachNeighbour: %f"), waterAmountForEachNeighbour);
 		for (int& i : sideNeighbours)
 			AddWaterSpilt(i, waterAmountForEachNeighbour);
-		AddWaterSpilt(index, -waterAmountForEachNeighbour * (float)(sideNeighbours.size()));
+		for (int& i : diagonalNeighbours)
+			AddWaterSpilt(i, waterAmountForEachNeighbour * diagWeight);
+		AddWaterSpilt(index, -waterAmountForEachNeighbour * ((float)diagonalNeighbours.size() * diagWeight + (float)sideNeighbours.size()));
 	}
 }
 bool AWorldController::IsNeighbourFreeToBeSpilledTo(const int& currentIndex, const int& neighbourIndex) {
@@ -331,7 +371,7 @@ bool AWorldController::IsNeighbourFreeToBeSpilledTo(const int& currentIndex, con
 			return false;
 		if (GetWaterCubeIfPresent(neighbourIndex) == nullptr)
 			return true;
-		if (GetCurrentWaterLevel(neighbourIndex) < GetCurrentWaterLevel(currentIndex))
+		if (GetCurrentWaterLevel(neighbourIndex) + GetWaterSpilt(neighbourIndex) < GetCurrentWaterLevel(currentIndex) + GetWaterSpilt(currentIndex))
 			return true;
 	}
 	return false;

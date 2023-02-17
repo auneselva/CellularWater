@@ -90,7 +90,7 @@ private:
 	int GetRightNeighborIndex(const int& index);
 	int GetRightBehindNeighborIndex(const int& index); //by diagonal
 	int GetBehindNeighborIndex(const int& index);
-	int GetBehindLeftBehindNeighborIndex(const int& index); //by diagonal
+	int GetBehindLeftNeighborIndex(const int& index); //by diagonal
 	int GetLeftNeighborIndex(const int& index);
 	int GetLeftFrontNeighborIndex(const int& index); //by diagonal
 	int GetBottomNeighborIndex(const int& index);
