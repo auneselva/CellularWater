@@ -294,7 +294,7 @@ void AWorldController::SpillAround(const int& index) {
 		UE_LOG(LogTemp, Warning, TEXT("leftIndex: %d"), leftIndex);
 		UE_LOG(LogTemp, Warning, TEXT("rightIndex: %d"), rightIndex);
 		*/
-		float waterAmountForEachNeighbour = GetCurrentWaterLevel(index) / ((float)(sideNeighbours.size()) + 1.0f);
+		float waterAmountForEachNeighbour = std::clamp(GetCurrentWaterLevel(index) / ((float)(sideNeighbours.size()) + 1.0f), 0.0f, 0.2f * GetCurrentWaterLevel(index));
 		//UE_LOG(LogTemp, Warning, TEXT("waterAmountForEachNeighbour: %f"), waterAmountForEachNeighbour);
 		for (int& i : sideNeighbours)
 			AddWaterSpilt(i, waterAmountForEachNeighbour);
@@ -307,7 +307,7 @@ bool AWorldController::IsNeighbourFreeToBeSpilledTo(const int& currentIndex, con
 			return false;
 		if (GetWaterCubeIfPresent(neighbourIndex) == nullptr)
 			return true;
-		if (GetCurrentWaterLevel(neighbourIndex) + GetWaterSpilt(neighbourIndex) < GetCurrentWaterLevel(currentIndex) + GetWaterSpilt(currentIndex))
+		if (GetCurrentWaterLevel(neighbourIndex) < GetCurrentWaterLevel(currentIndex))
 			return true;
 	}
 	return false;
