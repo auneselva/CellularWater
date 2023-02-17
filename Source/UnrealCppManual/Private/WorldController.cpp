@@ -307,7 +307,7 @@ bool AWorldController::IsNeighbourFreeToBeSpilledTo(const int& currentIndex, con
 			return false;
 		if (GetWaterCubeIfPresent(neighbourIndex) == nullptr)
 			return true;
-		if (GetCurrentWaterLevel(neighbourIndex) < GetCurrentWaterLevel(currentIndex))
+		if (GetCurrentWaterLevel(neighbourIndex) + GetWaterSpilt(neighbourIndex) < GetCurrentWaterLevel(currentIndex) + GetWaterSpilt(currentIndex))
 			return true;
 	}
 	return false;
