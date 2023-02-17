@@ -159,7 +159,11 @@ int AWorldController::GetFrontNeighborIndex(const int& index) {
 		return -1;
 	return resultIndex;
 }
-
+int AWorldController::GetFrontRightNeighborIndex(const int& index) {
+	int frontIndex = GetFrontNeighborIndex(index);
+	int resultIndex = GetRightNeighborIndex(frontIndex);
+	return resultIndex;
+}
 int AWorldController::GetRightNeighborIndex(const int& index) {
 	int resultIndex = index - 1;
 	// if outside bounds return -1 to let us know it is a blocking cell
@@ -168,10 +172,22 @@ int AWorldController::GetRightNeighborIndex(const int& index) {
 	return resultIndex;
 }
 
+int AWorldController::GetRightBehindNeighborIndex(const int& index) {
+	int rightIndex = GetRightNeighborIndex(index);
+	int resultIndex = GetBehindNeighborIndex(rightIndex);
+	return resultIndex;
+}
+
+
 int AWorldController::GetBehindNeighborIndex(const int& index) {
 	int resultIndex = index - xNCells;
 	if (resultIndex / xyNCells < index / xyNCells)
 		return -1;
+	return resultIndex;
+}
+int AWorldController::GetBehindLeftBehindNeighborIndex(const int& index) {
+	int behindIndex = GetBehindNeighborIndex(index);
+	int resultIndex = GetLeftNeighborIndex(behindIndex);
 	return resultIndex;
 }
 
@@ -180,6 +196,12 @@ int AWorldController::GetLeftNeighborIndex(const int& index) {
 	// if outside bounds return -1 to let us know it is a blocking cell
 	if (resultIndex / yNCells > index / yNCells)
 		return -1;
+	return resultIndex;
+}
+
+int AWorldController::GetLeftFrontNeighborIndex(const int& index) {
+	int leftIndex = GetLeftNeighborIndex(index);
+	int resultIndex = GetFrontNeighborIndex(leftIndex);
 	return resultIndex;
 }
 
@@ -270,6 +292,8 @@ void AWorldController::SpillAround(const int& index) {
 		//UE_LOG(LogTemp, Warning, TEXT("Cannot fall down"));
 		std::vector<int> sideNeighbours;
 		sideNeighbours.reserve(4);
+		std::vector<int> diagonalNeighbours;
+		diagonalNeighbours.reserve(4);
 		//UE_LOG(LogTemp, Warning, TEXT("Current index: %d"), index);
 		int rightIndex = GetRightNeighborIndex(index);
 
@@ -294,7 +318,7 @@ void AWorldController::SpillAround(const int& index) {
 		UE_LOG(LogTemp, Warning, TEXT("leftIndex: %d"), leftIndex);
 		UE_LOG(LogTemp, Warning, TEXT("rightIndex: %d"), rightIndex);
 		*/
-		float waterAmountForEachNeighbour = std::clamp(GetCurrentWaterLevel(index) / ((float)(sideNeighbours.size()) + 1.0f), 0.0f, 0.2f * GetCurrentWaterLevel(index));
+		float waterAmountForEachNeighbour = GetCurrentWaterLevel(index) / ((float)(sideNeighbours.size()) + 1.0f);
 		//UE_LOG(LogTemp, Warning, TEXT("waterAmountForEachNeighbour: %f"), waterAmountForEachNeighbour);
 		for (int& i : sideNeighbours)
 			AddWaterSpilt(i, waterAmountForEachNeighbour);
