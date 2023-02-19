@@ -6,6 +6,7 @@
 #include "WaterCube.h"
 #include "BlockCube.h"
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include <WorldBorder.h>
 
 // Sets default values
 AActorSpawner::AActorSpawner()
@@ -41,10 +42,12 @@ void AActorSpawner::SpawnBlockCube()
 
 	if (worldController->CheckIfCellFree(cellIndex))
 	{
-		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*worldController->GetCellPosition(cellIndex), FRotator3d());
+		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*worldController->GetCellPosition(cellIndex), *defaultRotation);
 		worldController->SetBlockCubeInTheGrid(cellIndex);
 	}
 }
+
+
 // Called when the game starts or when spawned
 void AActorSpawner::BeginPlay()
 {

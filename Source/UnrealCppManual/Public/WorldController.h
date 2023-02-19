@@ -27,6 +27,7 @@ public:
 	AWorldController();
 	~AWorldController();
 	FRotator3d* defaultRotation;
+
 	// Called every frame
 	int GetCellIndexAtFloatPosition(std::shared_ptr<FVector> position);
 	bool CheckIfCellFree(const int& cellIndex);
@@ -63,7 +64,8 @@ private:
 
 	Cell* grid3d;
 	float gameTimeElapsed;
-	
+	void CreateWorldBorders();
+	void SpawnWorldBorder(FVector spawn, UE::Math::TVector<double> scale, FRotator3d rotator);
 	bool CheckIfInBoundaries(const int& x, const int& y, const int& z);
 	bool CheckIfCellWIthinBounds(const int& index);
 	bool CheckIfBlockCell(const int& index);

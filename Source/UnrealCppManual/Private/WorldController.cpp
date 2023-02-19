@@ -6,10 +6,12 @@
 #include <vector>
 #include <algorithm>
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
-
+#include "ActorSpawner.h"
+#include <WorldBorder.h>
 AWorldController::AWorldController()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	defaultRotation = new FRotator3d();
 	XLeftBound = -BOUND;
 	XRightBound = BOUND;
 	YLeftBound = -BOUND;
@@ -24,14 +26,51 @@ AWorldController::AWorldController()
 	grid3d = new Cell[N_CELLS];
 	for (int i = 0; i < N_CELLS; i++)
 		grid3d[i].CalculatePosition(i, CELL_SIZE, XLeftBound, XRightBound, YLeftBound, YRightBound, ZLeftBound, ZRightBound);
-	defaultRotation = new FRotator3d();
+	//SpawnWorldBorders();
 	//UE_LOG(LogTemp, Warning, TEXT("Grid3d %d"), grid3d[7999].WaterCube );
 
+}
+void AWorldController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	gameTimeElapsed = 0;
+	CreateWorldBorders();
 }
 AWorldController::~AWorldController()
 {
 	delete[] grid3d;
 	delete defaultRotation;
+}
+
+void AWorldController::CreateWorldBorders() {
+	// 12 orange lines
+
+	//down 
+	SpawnWorldBorder(FVector(CELL_SIZE * (XLeftBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YRightBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
+
+
+	// vertical
+	SpawnWorldBorder(FVector(CELL_SIZE * (XLeftBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XLeftBound - 0.5f), CELL_SIZE * (YRightBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YRightBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
+
+	//up
+	SpawnWorldBorder(FVector(CELL_SIZE * (XLeftBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YRightBound - 0.5f), CELL_SIZE * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
+
+
+}
+void AWorldController::SpawnWorldBorder(FVector spawn, UE::Math::TVector<double> scale, FRotator3d rotator) {
+
+	AWorldBorder* worldBorder = GetWorld()->SpawnActor<AWorldBorder>(spawn, rotator);
+	worldBorder->SetActorScale3D(std::move(scale));
 }
 
 int AWorldController::GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> cellPosition) {
@@ -211,13 +250,7 @@ int AWorldController::GetBottomNeighborIndex(const int& index) {
 }
 
 // Called when the game starts or when spawned
-void AWorldController::BeginPlay()
-{
-	Super::BeginPlay();
 
-	gameTimeElapsed = 0;
-	//GetWorldTimerManager().SetTimer(MemberTimerHandle, this, Gravity, 1.0f, true, 2.0f);
-}
 
 void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
 {
