@@ -310,9 +310,9 @@ void AWorldController::ApplySimulationProccesses() {
 		if (GetCurrentWaterLevel(i) > PRECISION_OFFSET)
 			UE_LOG(LogTemp, Warning, TEXT("%d: %f"), i, GetCurrentWaterLevel(i))
 	} */
-	//CalculateWaterCubeCapacity();
-	//ApplyCalculatedCapacities();
-	//DetermineWaterFlow();
+	CalculateWaterCubeCapacity();
+	ApplyCalculatedCapacities();
+	DetermineWaterFlow();
 	HandleSpiltWater(0, N_CELLS);
 	for (int i = 0; i < N_CELLS; i++)
 		grid3d[i].AdjustWaterCubesTransformIfPresent(CELL_SIZE);
@@ -463,10 +463,9 @@ void AWorldController::CalculateWaterCubeCapacity() {
 
 		bool checkingUpwards = true;
 		bool blockAbove = false;
-		int topIndex;
+		int topIndex = GetTopNeighborIndex(i);
 
 		while (true) {
-			topIndex = GetTopNeighborIndex(i);
 			if (!CheckIfCellWIthinBounds(topIndex)) {
 				break;
 			}
@@ -486,6 +485,7 @@ void AWorldController::CalculateWaterCubeCapacity() {
 			if (!CheckIfFullCapacityReached(topIndex, currentLevel)) {
 				break;
 			}
+			topIndex = GetTopNeighborIndex(topIndex);
 
 		}
 

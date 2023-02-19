@@ -50,8 +50,7 @@ void AWaterCube::SetWaterColorByCapacity() {
 	else
 		color->R = (0.5f * currentWaterCapacity);
 	color->G = 0.2f + (color->R / 1.0f) * 0.8f;
-
-	UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
+//UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
 }
 
 void AWaterCube::ChangeColorInTime(const float &delta) {
@@ -67,7 +66,7 @@ void AWaterCube::ChangeColorInTime(const float &delta) {
 	color->G = 0.2f + (color->R / 1.0f) * 0.8f;
 	//std::clamp(color.B, 0.0f, 1.0f);
 	if (material->IsValidLowLevel()) {
-		UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
+		//UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
 		material->SetVectorParameterValue(FName(TEXT("WaterColor")), *color);
 	}
 }
