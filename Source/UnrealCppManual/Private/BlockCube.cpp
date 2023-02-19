@@ -22,17 +22,4 @@ ABlockCube::ABlockCube()
 }
 ABlockCube::~ABlockCube() {}
 
-// Called when the game starts or when spawned
-void ABlockCube::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ABlockCube::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 

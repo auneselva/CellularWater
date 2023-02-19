@@ -12,7 +12,7 @@
 AActorSpawner::AActorSpawner()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	SpawnVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnVolume"));
 
@@ -47,18 +47,4 @@ void AActorSpawner::SpawnBlockCube()
 	}
 }
 
-
-// Called when the game starts or when spawned
-void AActorSpawner::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AActorSpawner::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 

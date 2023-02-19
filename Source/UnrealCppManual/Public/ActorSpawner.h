@@ -25,12 +25,8 @@ public:
         AActor* spawner;
     FRotator3d* defaultRotation;
 protected:
-    // Called when the game starts or when spawned
-    virtual void BeginPlay() override;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         class UBoxComponent* SpawnVolume;
-public:
-    // Called every frame
-    virtual void Tick(float DeltaTime) override;
+
 };
