@@ -18,6 +18,7 @@ private:
 	UMaterialInstanceDynamic* material;
 	FLinearColor* color;
 	bool colorRaising;
+	void SetWaterColorByCapacity();
 	void ChangeColorInTime(const float &delta);
 public:	
 	// Sets default values for this actor's properties

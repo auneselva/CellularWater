@@ -44,6 +44,16 @@ void AWaterCube::BeginPlay()
 	VisualMesh->SetMaterial(0, material);
 }
 
+void AWaterCube::SetWaterColorByCapacity() {
+	if (colorRaising)
+		color->R = (0.5f * currentWaterCapacity);
+	else
+		color->R = (0.5f * currentWaterCapacity);
+	color->G = 0.2f + (color->R / 1.0f) * 0.8f;
+
+	UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
+}
+
 void AWaterCube::ChangeColorInTime(const float &delta) {
 	if (color->R < 0.01f && !colorRaising)
 		colorRaising = true;
@@ -57,24 +67,16 @@ void AWaterCube::ChangeColorInTime(const float &delta) {
 	color->G = 0.2f + (color->R / 1.0f) * 0.8f;
 	//std::clamp(color.B, 0.0f, 1.0f);
 	if (material->IsValidLowLevel()) {
-		//UE_LOG(LogTemp, Warning, TEXT("The RGBs value is %f, %f, %f"), color->R, color->G, color->B);
+		UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
 		material->SetVectorParameterValue(FName(TEXT("WaterColor")), *color);
 	}
 }
 
-// Called every frame
 void AWaterCube::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//FVector NewLocation = GetActorLocation();
-	//FRotator NewRotation = GetActorRotation();
-	//float RunningTime = GetGameTimeSinceCreation();
-	//float DeltaHeight = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
-	//NewLocation.Z += DeltaHeight * 20.0f;       //Scale our height by a factor of 20
-	//float DeltaRotation = DeltaTime * 20.0f;    //Rotate by 20 degrees per second
-	//NewRotation.Yaw += DeltaRotation;
-	//SetActorLocationAndRotation(NewLocation, NewRotation);
-	ChangeColorInTime(DeltaTime);
+	SetWaterColorByCapacity();
+	//ChangeColorInTime(DeltaTime);
 
 }
 
