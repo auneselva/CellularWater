@@ -240,10 +240,9 @@ void ACameraPawn::ToggleSpawnerAttachment() {
 
 void ACameraPawn::SpawnWaterCube(float AxisValue) {
 	if (AxisValue > 0.9f) {
-		//Find the Actor Spawner in the world, and invoke it's Spawn Actor function
-		AActor* ActorSpawnerTofind = UGameplayStatics::GetActorOfClass(GetWorld(), AActorSpawner::StaticClass());
+		AActor* ActorSpawner = UGameplayStatics::GetActorOfClass(spawner, AActorSpawner::StaticClass());
 
-		AActorSpawner* ActorSpawnerReference = Cast<AActorSpawner>(ActorSpawnerTofind);
+		AActorSpawner* ActorSpawnerReference = Cast<AActorSpawner>(ActorSpawner);
 		if (ActorSpawnerReference)
 		{
 			ActorSpawnerReference->SpawnWaterCube();
@@ -252,10 +251,8 @@ void ACameraPawn::SpawnWaterCube(float AxisValue) {
 }
 void ACameraPawn::SpawnBlockCube(float AxisValue) {
 	if (AxisValue > 0.9f) {
-		//Find the Actor Spawner in the world, and invoke it's Spawn Actor function
-		AActor* ActorSpawnerTofind = UGameplayStatics::GetActorOfClass(GetWorld(), AActorSpawner::StaticClass());
-
-		AActorSpawner* ActorSpawnerReference = Cast<AActorSpawner>(ActorSpawnerTofind);
+		AActor* ActorSpawner = UGameplayStatics::GetActorOfClass(spawner, AActorSpawner::StaticClass());
+		AActorSpawner* ActorSpawnerReference = Cast<AActorSpawner>(ActorSpawner);
 		if (ActorSpawnerReference)
 		{
 			ActorSpawnerReference->SpawnBlockCube();

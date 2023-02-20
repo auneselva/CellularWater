@@ -42,7 +42,6 @@ private:
 		ACameraPawn* Cameras[3];
 	UPROPERTY(EditAnywhere)
 		AActor* spawner;
-
 	bool changeCameraLock;
 	bool spawnerAttached;
 
