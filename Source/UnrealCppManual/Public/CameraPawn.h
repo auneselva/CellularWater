@@ -63,8 +63,8 @@ private:
 	void MoveRightSpawner(float AxisValue);
 	void MoveUpSpawner(float AxisValue);
 	void ToggleSpawnerAttachment();
-	void SpawnWaterCube();
-	void SpawnBlockCube();
+	void SpawnWaterCube(float AxisValue);
+	void SpawnBlockCube(float AxisValue);
 	void DestroyActor();
 
 	void UpdateCameraPawnTransform(const float& DeltaTime);
