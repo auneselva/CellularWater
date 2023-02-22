@@ -479,7 +479,7 @@ void AWorldController::CalculateWaterCubeCapacity() {
 	indicesInZStack.reserve(zNCells);
 
 	for (int i = 0; i < N_CELLS; i++) {
-		AWaterCube* waterCube = grid3d[i].WaterCube;
+		AWaterCube* waterCube = GetWaterCubeIfVisible(i);
 		if (waterCube == nullptr)
 			continue;
 		waterCube->nextIterationWaterCapacity = BASE_CAPACITY;
@@ -595,7 +595,7 @@ void AWorldController::GetHigherCapacity(float& currCapacity, const int& index, 
 
 void AWorldController::ApplyCalculatedCapacities() {
 	for (int i = 0; i < N_CELLS; i++) {
-		AWaterCube* waterCube = grid3d[i].WaterCube;
+		AWaterCube* waterCube = GetWaterCubeIfVisible(i);
 		if (waterCube != nullptr) {
 			waterCube->currentWaterCapacity = waterCube->nextIterationWaterCapacity;
 			waterCube->nextIterationWaterCapacity = BASE_CAPACITY;
@@ -675,7 +675,7 @@ void AWorldController::EvaluateFlowFromNeighbours(const int& index) {
 
 float AWorldController::GetWaterOverloadInCell(const int& index) {
 	if (CheckIfCellWIthinBounds(index)) {
-		AWaterCube* waterCube = grid3d[index].WaterCube;
+		AWaterCube* waterCube = GetWaterCubeIfVisible(index);
 		if (waterCube == nullptr && !CheckIfBlockCell(index)) {
 			return 10.0f;
 		}
