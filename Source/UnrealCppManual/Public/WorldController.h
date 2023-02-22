@@ -30,12 +30,14 @@ public:
 	// Called every frame
 	int GetCellIndexAtFloatPosition(std::shared_ptr<FVector> position);
 	bool CheckIfCellFree(const int& cellIndex);
+	bool IsWaterCubeHiddenHere(const int& index);
+	AWaterCube* GetWaterCubeIfPresent(const int& index);
+	void SetWaterCubeVisibility(const int& index, bool state);
 	void SetWaterCubeInTheGrid(AWaterCube* newWaterCube, const int& cellIndex);
 	void SetBlockCubeInTheGrid(int cellIndex);
 	void SetWaterLevel(const int& index, const float& waterLevel);
 	const UE::Math::TVector<double>* GetCellPosition(const int& index);
 	void DetachWaterCubeFromTheCell(const int& index);
-	void DestroyWaterCubeActor(const int& index);
 	virtual void Tick(float DeltaTime) override;
 
 protected:
@@ -68,7 +70,7 @@ private:
 	bool CheckIfInBoundaries(const int& x, const int& y, const int& z);
 	bool CheckIfCellWIthinBounds(const int& index);
 	bool CheckIfBlockCell(const int& index);
-	AWaterCube* GetWaterCubeIfPresent(const int& index);
+	AWaterCube* GetWaterCubeIfVisible(const int& index);
 	float GetCurrentWaterLevel(const int& index);
 	void SetNextIterationWaterLevel(const int& index, const float& waterLevel);
 	bool CheckIfFullCapacityReached(const int& index, const float& level);

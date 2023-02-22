@@ -24,8 +24,10 @@ AWorldController::AWorldController()
 	xyNCells = (XRightBound - XLeftBound) * (YRightBound - YLeftBound);
 
 	grid3d = new Cell[N_CELLS];
-	for (int i = 0; i < N_CELLS; i++)
+	for (int i = 0; i < N_CELLS; i++) {
 		grid3d[i].CalculatePosition(i, CELL_SIZE, XLeftBound, XRightBound, YLeftBound, YRightBound, ZLeftBound, ZRightBound);
+		
+	}
 	//SpawnWorldBorders();
 	//UE_LOG(LogTemp, Warning, TEXT("Grid3d %d"), grid3d[7999].WaterCube );
 
@@ -113,7 +115,7 @@ bool AWorldController::CheckIfCellFree(const int& cellIndex) {
 	}
 	if (CheckIfBlockCell(cellIndex))
 		return false;
-	if (GetWaterCubeIfPresent(cellIndex) != nullptr)
+	if (GetWaterCubeIfVisible(cellIndex) != nullptr)
 		return false;
 	return true;
 }
@@ -127,9 +129,34 @@ bool AWorldController::CheckIfBlockCell(const int& index) {
 }
 
 AWaterCube* AWorldController::GetWaterCubeIfPresent(const int& index) {
+	if (grid3d[index].WaterCube == nullptr) {
+		return nullptr;
+	}
 	return grid3d[index].WaterCube;
 }
 
+AWaterCube* AWorldController::GetWaterCubeIfVisible(const int& index) {
+	if (grid3d[index].WaterCube == nullptr) {
+		return nullptr;
+	}
+	if (IsWaterCubeHiddenHere(index))
+		return nullptr;
+	return grid3d[index].WaterCube;
+}
+
+bool AWorldController::IsWaterCubeHiddenHere(const int& index) {
+	if (grid3d[index].WaterCube == nullptr) {
+		return false;
+	}
+	if (!grid3d[index].WaterCube->IsHidden())
+		return false;
+	return true;
+}
+void AWorldController::SetWaterCubeVisibility(const int& index, bool state) {
+	if (grid3d[index].WaterCube == nullptr)
+		return;
+	grid3d[index].WaterCube->SetActorHiddenInGame(!state);
+}
 float AWorldController::GetCurrentWaterLevel(const int& index) {
 	return grid3d[index].currentWaterLevel;
 }
@@ -175,12 +202,6 @@ void AWorldController::SetBlockCubeInTheGrid(int cellIndex) {
 const UE::Math::TVector<double>* AWorldController::GetCellPosition(const int& index)
 {
 	return grid3d[index].GetPosition();
-}
-
-void AWorldController::DestroyWaterCubeActor(const int& index) {
-	if (grid3d[index].WaterCube != nullptr)
-		GetWorld()->DestroyActor(grid3d[index].WaterCube);
-	DetachWaterCubeFromTheCell(index);
 }
 
 void AWorldController::DetachWaterCubeFromTheCell(const int& index) {
@@ -276,7 +297,7 @@ void AWorldController::Gravity(const int& index) {
 
 	if (CanWaterFallDown(index)) {
 		int bottomIndex = GetBottomNeighborIndex(index);
-		if (GetWaterCubeIfPresent(bottomIndex) != nullptr) {
+		if (GetWaterCubeIfVisible(bottomIndex) != nullptr) {
 			float waterAmountToBeFlown = GetWaterCapacity(bottomIndex) - GetCurrentWaterLevel(bottomIndex);
 			
 			AddWaterSpilt(bottomIndex, waterAmountToBeFlown);
@@ -291,7 +312,7 @@ void AWorldController::Gravity(const int& index) {
 
 void AWorldController::ApplySimulationProccesses() {
 	for (int i = 0; i < N_CELLS; i++) {
-		if (GetWaterCubeIfPresent(i) != nullptr) {
+		if (GetWaterCubeIfVisible(i) != nullptr) {
 			Gravity(i);
 			SpillAround(i);
 		}
@@ -402,7 +423,7 @@ bool AWorldController::IsNeighbourFreeToBeSpilledTo(const int& currentIndex, con
 	if (CheckIfCellWIthinBounds(neighbourIndex)) {
 		if (CheckIfBlockCell(neighbourIndex))
 			return false;
-		if (GetWaterCubeIfPresent(neighbourIndex) == nullptr)
+		if (GetWaterCubeIfVisible(neighbourIndex) == nullptr)
 			return true;
 		if (GetCurrentWaterLevel(neighbourIndex) + GetWaterSpilt(neighbourIndex) < GetCurrentWaterLevel(currentIndex) + GetWaterSpilt(currentIndex))
 			return true;
@@ -414,7 +435,7 @@ bool AWorldController::CanWaterFallDown(const int& currentIndex) {
 	if (CheckIfCellWIthinBounds(bottomIndex)) {
 		if (CheckIfBlockCell(bottomIndex))
 			return false;
-		if (GetWaterCubeIfPresent(bottomIndex) == nullptr)
+		if (GetWaterCubeIfVisible(bottomIndex) == nullptr)
 			return true;
 		if (!CheckIfFullCapacityReached(bottomIndex, GetCurrentWaterLevel(bottomIndex)))
 			return true;
@@ -426,11 +447,15 @@ void AWorldController::HandleSpiltWater(int start, int end) { //or handle pressu
 		if (!CheckIfBlockCell(i)) {
 			float summedWaterInCell = GetWaterSpilt(i) + GetCurrentWaterLevel(i);
 			if (summedWaterInCell < PRECISION_OFFSET) {
-				DestroyWaterCubeActor(i);
+				SetWaterCubeVisibility(i, false);
 				SetNextIterationWaterLevel(i, 0.0f);
 			}
 			else if (summedWaterInCell >= PRECISION_OFFSET) {
-				if (GetWaterCubeIfPresent(i) == nullptr) {
+
+				if (GetWaterCubeIfPresent(i) != nullptr)
+					SetWaterCubeVisibility(i, true);
+				else
+				{
 					AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*GetCellPosition(i), *defaultRotation);
 					SetWaterCubeInTheGrid(newCube, i);
 				}
@@ -475,7 +500,7 @@ void AWorldController::CalculateWaterCubeCapacity() {
 				break;
 			}
 
-			if (GetWaterCubeIfPresent(topIndex) == nullptr) {
+			if (GetWaterCubeIfVisible(topIndex) == nullptr) {
 				break;
 			}
 
@@ -556,7 +581,7 @@ void AWorldController::GetHigherCapacity(float& currCapacity, const int& index, 
 		return;
 	}
 
-	AWaterCube* waterCube = GetWaterCubeIfPresent(index);
+	AWaterCube* waterCube = GetWaterCubeIfVisible(index);
 	if (waterCube == nullptr)
 		return;
 	isWaterAround = true;
@@ -580,7 +605,7 @@ void AWorldController::ApplyCalculatedCapacities() {
 
 void AWorldController::DetermineWaterFlow() {
 	for (int i = 0; i < N_CELLS; i++) {
-		AWaterCube* waterCube = GetWaterCubeIfPresent(i);
+		AWaterCube* waterCube = GetWaterCubeIfVisible(i);
 		if (waterCube != nullptr) {
 			float currentLevel = GetCurrentWaterLevel(i);
 			int bottomIndex = GetBottomNeighborIndex(i);

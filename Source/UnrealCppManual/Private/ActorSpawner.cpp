@@ -29,8 +29,13 @@ void AActorSpawner::SpawnWaterCube()
 
 	if (worldController->CheckIfCellFree(cellIndex))
 	{
-		AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector) *worldController->GetCellPosition(cellIndex), *defaultRotation);
-		worldController->SetWaterCubeInTheGrid(newCube, cellIndex);
+		if (worldController->GetWaterCubeIfPresent(cellIndex) != nullptr)
+			worldController->SetWaterCubeVisibility(cellIndex, true);
+		else
+		{
+			AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*worldController->GetCellPosition(cellIndex), *defaultRotation);
+			worldController->SetWaterCubeInTheGrid(newCube, cellIndex);
+		}
 		worldController->SetWaterLevel(cellIndex, 1.0f);
 	}
 }
