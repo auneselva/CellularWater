@@ -331,9 +331,9 @@ void AWorldController::ApplySimulationProccesses() {
 		if (GetCurrentWaterLevel(i) > PRECISION_OFFSET)
 			UE_LOG(LogTemp, Warning, TEXT("%d: %f"), i, GetCurrentWaterLevel(i))
 	} */
-	CalculateWaterCubeCapacity();
-	ApplyCalculatedCapacities();
-	DetermineWaterFlow();
+	//CalculateWaterCubeCapacity();
+	//ApplyCalculatedCapacities();
+	//DetermineWaterFlow();
 	HandleSpiltWater(0, N_CELLS);
 	for (int i = 0; i < N_CELLS; i++)
 		grid3d[i].AdjustWaterCubesTransformIfPresent(CELL_SIZE);
@@ -410,13 +410,22 @@ void AWorldController::SpillAround(const int& index) {
 		// CurrentLevel = x ( (sideneighbours.size() + 1) + diagNeighbours.size * 0.5)
 		// x = CurrentLevel/ ( (sideneighbours.size() + 1) + diagNeighbours.size * 0.5)
 		float diagWeight = 0.5f;
-		float waterAmountForEachNeighbour = std::clamp(GetCurrentWaterLevel(index) / ((float)(sideNeighbours.size()) + 1.0f + (float)diagonalNeighbours.size() * diagWeight), 0.0f, 0.2f);
+
+		float diagWaterSum = 0.0f;
+		float sideWaterSum = 0.0f;
+		for (int& i : sideNeighbours)
+			sideWaterSum += GetCurrentWaterLevel(i) + GetWaterSpilt(i);
+		for (int& i : diagonalNeighbours)
+			diagWaterSum += GetCurrentWaterLevel(i) + GetWaterSpilt(i);
+		float sumWater = sideWaterSum + diagWaterSum + GetCurrentWaterLevel(index) + GetWaterSpilt(index);
+		const int cells = sideNeighbours.size() + diagonalNeighbours.size() + 1;
+		float waterAmountForEach = sumWater / cells;
 		//UE_LOG(LogTemp, Warning, TEXT("waterAmountForEachNeighbour: %f"), waterAmountForEachNeighbour);
 		for (int& i : sideNeighbours)
-			AddWaterSpilt(i, waterAmountForEachNeighbour);
+			AddWaterSpilt(i, waterAmountForEach - (GetCurrentWaterLevel(i) + GetWaterSpilt(i)));
 		for (int& i : diagonalNeighbours)
-			AddWaterSpilt(i, waterAmountForEachNeighbour * diagWeight);
-		AddWaterSpilt(index, -waterAmountForEachNeighbour * ((float)diagonalNeighbours.size() * diagWeight + (float)sideNeighbours.size()));
+			AddWaterSpilt(i, waterAmountForEach - (GetCurrentWaterLevel(i) + GetWaterSpilt(i)));
+		AddWaterSpilt(index, waterAmountForEach - (GetCurrentWaterLevel(index) + GetWaterSpilt(index)));
 	}
 }
 bool AWorldController::IsNeighbourFreeToBeSpilledTo(const int& currentIndex, const int& neighbourIndex) {

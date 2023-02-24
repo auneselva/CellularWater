@@ -7,7 +7,7 @@
 #include "Cell.h"
 #include "WorldController.generated.h"
 
-#define BOUND 10
+#define BOUND 3
 #define N_CELLS (BOUND + BOUND) * (BOUND + BOUND) * (BOUND + BOUND)
 #define CELL_SIZE 100.0
 #define SIMULATION_SPEED 0.2
