@@ -104,7 +104,8 @@ private:
 	void SpillAround(const int& index);
 	bool IsNeighbourFreeToBeSpilledTo(const int& currentIndex, const int& neighbourIndex);
 	bool CanWaterFallDown(const int& currentIndex);
-	void HandleSpiltWater(int start, int end);
+	bool CanWaterSpillAround(const int& index);
+	void HandleSpiltWater();
 	void ApplyNextIterWaterToCurrent();
 	void SpreadOverwateredCell(const int& index);
 	void ApplySimulationProccesses();
