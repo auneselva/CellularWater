@@ -14,7 +14,7 @@
 #define BASE_CAPACITY 1.0
 #define EXCEED_MODIFIER 0.02
 #define PRECISION_OFFSET 0.001
-#define MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD 0.2
+#define MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD 1.0
 
 UCLASS()
 class UNREALCPPMANUAL_API AWorldController : public AActor
@@ -75,7 +75,7 @@ private:
 	void SetNextIterationWaterLevel(const int& index, const float& waterLevel);
 	bool CheckIfFullCapacityReached(const int& index, const float& level);
 	float CalculateWaterOverload(const int& index);
-	bool SetNeighbourWaterCapacityIfPresent(const int& index);
+	bool SetByNeighbourWaterCapacityIfPresent(const int& index);
 	float GetWaterSpilt(const int& index);
 	void AddWaterSpilt(const int& index, const float& amount);
 	void SetWaterSpilt(const int& index, const float& amount);

@@ -10,7 +10,7 @@ AWorldBorder::AWorldBorder()
 	PrimaryActorTick.bCanEverTick = false;
 
 	VisualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	VisualMesh->SetupAttachment(RootComponent);
+	SetRootComponent(VisualMesh);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Border.Shape_Border"));
 

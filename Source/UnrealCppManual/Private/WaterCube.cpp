@@ -12,7 +12,7 @@ AWaterCube::AWaterCube() : currentWaterCapacity(BASE_CAPACITY), nextIterationWat
 	PrimaryActorTick.bCanEverTick = true;
 
 	VisualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	VisualMesh->SetupAttachment(RootComponent);
+	SetRootComponent(VisualMesh);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_WaterCube.Shape_WaterCube"));
 
