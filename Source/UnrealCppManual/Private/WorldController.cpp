@@ -340,9 +340,9 @@ void AWorldController::ApplySimulationProccesses() {
 	
 	CalculateWaterCubeCapacity();
 	ApplyCalculatedCapacities(); //
-	//for (int i = 0; i < N_CELLS; i++)
-	//	if (GetWaterCubeIfVisible(i) != nullptr)
-	//		UE_LOG(LogTemp, Warning, TEXT("GetCurrentWaterLevel(%d): %f, GetWaterSpilt() %f, GetWaterCapacity(): %f"), i, GetCurrentWaterLevel(i), GetWaterSpilt(i), GetWaterCapacity(i));
+	for (int i = 0; i < N_CELLS; i++)
+		if (GetWaterCubeIfVisible(i) != nullptr)
+			UE_LOG(LogTemp, Warning, TEXT("GetCurrentWaterLevel(%d): %f, GetWaterSpilt() %f, GetWaterCapacity(): %f"), i, GetCurrentWaterLevel(i), GetWaterSpilt(i), GetWaterCapacity(i));
 
 	DetermineWaterFlow();
 	HandleSpiltWater();
@@ -732,5 +732,5 @@ float AWorldController::GetWaterOverloadInCell(const int& index) {
 			return overload;
 		}
 	}
-	return 1.0f;
+	return 10.0f;
 }

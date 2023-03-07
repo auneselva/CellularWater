@@ -5,7 +5,16 @@
 #include <algorithm>
 #include <string>
 #include <WorldController.h>
-// Sets default values
+
+float AWaterCube::minGColor = 0.05f;
+float AWaterCube::maxGColor = 0.2f;
+float AWaterCube::GColorRange = AWaterCube::maxGColor - AWaterCube::minGColor;
+float AWaterCube::minBColor = 0.1f;
+float AWaterCube::maxBColor = 0.85f;
+float AWaterCube::BColorRange = AWaterCube::maxBColor - AWaterCube::minBColor;
+int AWaterCube::worldHeight = BOUND * 2;
+float AWaterCube::capacityRange = std::max(0.0f, (float)((worldHeight - 1) * EXCEED_MODIFIER));
+
 AWaterCube::AWaterCube() : currentWaterCapacity(BASE_CAPACITY), nextIterationWaterCapacity(BASE_CAPACITY), isCapacityUndetermined(false)
 {
 
@@ -39,17 +48,21 @@ void AWaterCube::BeginPlay()
 {
 	Super::BeginPlay();
 	colorRaising = true;
-	color = new FLinearColor(0.0f, 0.2f, 1.0f);
+
+	color = new FLinearColor(0.0f, minGColor, minBColor, 0.0f);
 	material = UMaterialInstanceDynamic::Create(VisualMesh->GetMaterial(0), NULL);
 	VisualMesh->SetMaterial(0, material);
 }
 
 void AWaterCube::SetWaterColorByCapacity() {
-	if (colorRaising)
-		color->R = (0.5f * currentWaterCapacity);
-	else
-		color->R = (0.5f * currentWaterCapacity);
-	color->G = 0.2f + (color->R / 1.0f) * 0.8f;
+	color->R = 0.0f;
+	lvlOfCapacity = (currentWaterCapacity - (float)BASE_CAPACITY) / capacityRange;
+	color->G = maxGColor - GColorRange * lvlOfCapacity;
+	color->B = maxBColor - BColorRange * lvlOfCapacity;
+	if (material->IsValidLowLevel()) {
+		//UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
+		material->SetVectorParameterValue(FName(TEXT("WaterColor")), *color);
+	}
 //UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
 }
 
@@ -65,10 +78,6 @@ void AWaterCube::ChangeColorInTime(const float &delta) {
 		color->R -= (0.05f * delta);
 	color->G = 0.2f + (color->R / 1.0f) * 0.8f;
 	//std::clamp(color.B, 0.0f, 1.0f);
-	if (material->IsValidLowLevel()) {
-		//UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
-		material->SetVectorParameterValue(FName(TEXT("WaterColor")), *color);
-	}
 }
 
 void AWaterCube::Tick(float DeltaTime)

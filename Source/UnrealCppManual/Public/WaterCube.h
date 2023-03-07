@@ -14,16 +14,30 @@ class UNREALCPPMANUAL_API AWaterCube : public AActor
 	UPROPERTY(VisibleAnywhere)
 		UStaticMeshComponent* VisualMesh;
 private:
-	int currentCellIndex;
+	UPROPERTY(VisibleAnywhere)
+		int currentCellIndex;
 	UMaterialInstanceDynamic* material;
 	FLinearColor* color;
 	bool colorRaising;
+
+	float lvlOfCapacity;
 	void SetWaterColorByCapacity();
 	void ChangeColorInTime(const float &delta);
 public:	
 	// Sets default values for this actor's properties
 	AWaterCube();
 	~AWaterCube();
+
+	static float minGColor;
+	static float maxGColor;
+	static float GColorRange;
+	static float minBColor;
+	static float maxBColor;
+	static float BColorRange;
+
+	static int worldHeight;
+	static float capacityRange;
+	
 	float currentWaterCapacity;
 	float nextIterationWaterCapacity;
 	bool isCapacityUndetermined;
