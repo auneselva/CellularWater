@@ -41,6 +41,7 @@ public:
 	float currentWaterCapacity;
 	float nextIterationWaterCapacity;
 	bool isCapacityUndetermined;
+	int clusterNum;
 	void SetCurrentGridIndex(const int& index);
 	int GetCurrentGridIndex();
 protected:

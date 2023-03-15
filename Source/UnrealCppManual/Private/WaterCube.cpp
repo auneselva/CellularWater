@@ -15,7 +15,7 @@ float AWaterCube::BColorRange = AWaterCube::maxBColor - AWaterCube::minBColor;
 int AWaterCube::worldHeight = BOUND * 2;
 float AWaterCube::capacityRange = std::max(0.0f, (float)((worldHeight - 1) * EXCEED_MODIFIER));
 
-AWaterCube::AWaterCube() : currentWaterCapacity(BASE_CAPACITY), nextIterationWaterCapacity(BASE_CAPACITY), isCapacityUndetermined(false)
+AWaterCube::AWaterCube() : currentWaterCapacity(BASE_CAPACITY), nextIterationWaterCapacity(BASE_CAPACITY), isCapacityUndetermined(false), clusterNum(0)
 {
 
 	PrimaryActorTick.bCanEverTick = true;

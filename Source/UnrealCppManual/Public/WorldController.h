@@ -13,7 +13,7 @@
 #define SIMULATION_SPEED 0.2
 #define BASE_CAPACITY 1.0
 #define EXCEED_MODIFIER 0.02
-#define PRECISION_OFFSET 0.001
+#define PRECISION_OFFSET 0.00001
 #define MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD 1.0
 
 UCLASS()
@@ -26,8 +26,6 @@ public:
 	AWorldController();
 	~AWorldController();
 	FRotator3d* defaultRotation;
-
-	// Called every frame
 	int GetCellIndexAtFloatPosition(std::shared_ptr<FVector> position);
 	bool CheckIfCellFree(const int& cellIndex);
 	bool IsWaterCubeHiddenHere(const int& index);
@@ -65,6 +63,7 @@ private:
 
 	Cell* grid3d;
 	float gameTimeElapsed;
+	int simCounter;
 	void CreateWorldBorders();
 	void SpawnWorldBorder(FVector spawn, UE::Math::TVector<double> scale, FRotator3d rotator);
 	bool CheckIfInBoundaries(const int& x, const int& y, const int& z);
@@ -112,8 +111,15 @@ private:
 	void CalculateWaterCubeCapacity();
 	void GetHigherCapacity(float& currCapacity, const int& index, bool& isWaterAround);
 	void ApplyCalculatedCapacities();
+	void ClusterizeWaterGroupsOnLevels();
+	void TraverseAdjacentWaters(const int& currentCluster, const int& startIdx);
+	void SetAllCapacitiesInClusterToHighest(const int& nClusters, const int& firstIdx, const int& lastIdx);
+	void ResetClusters();
 	void DetermineWaterFlow();
 	void EvaluateFlowFromNeighbours(const int& index);
+	void FlowAccordingToPressure(const int& index);
+	void FlowPressurizedWaterUpwards();
 	float GetWaterOverloadInCell(const int& index);
+	float GetWaterAmountDiff(const int& index, const int& neighbourIndex);
 #pragma endregion Physics
 };
