@@ -8,7 +8,14 @@
 #include "WorldController.generated.h"
 
 #define BOUND 3
-#define N_CELLS (BOUND + BOUND) * (BOUND + BOUND) * (BOUND + BOUND)
+#define XLEFTBOUND -BOUND
+#define XRIGHTBOUND BOUND
+#define YLEFTBOUND -BOUND
+#define YRIGHTBOUND BOUND
+#define ZLEFTBOUND -BOUND
+#define ZRIGHTBOUND BOUND
+
+#define N_CELLS (XRIGHTBOUND - XLEFTBOUND) * (YRIGHTBOUND - YLEFTBOUND) * (ZRIGHTBOUND - ZLEFTBOUND)
 #define CELL_SIZE 100.0
 #define SIMULATION_SPEED 0.2
 #define BASE_CAPACITY 1.0
@@ -43,23 +50,15 @@ protected:
 	virtual void BeginPlay() override;
 private:
 
-	int XLeftBound; 
-	int XRightBound;
-	int YLeftBound; 
-	int YRightBound;
-	int ZLeftBound; 
-	int ZRightBound;
-
-
 	int xNCells;
 	int yNCells;
 	int zNCells;
 	int xyNCells;
 	// the grid consists of cells that are within 3-dimensional bounds. Those bounds define the piece of space for simulation.
 	// Those boundaries are in the following ranges:
-	// x: [XLeftBound, XRightBound - 1],
-	// y: [YLeftBound, YRightBound - 1],
-	// z: [ZLeftBound, ZRightBound - 1]
+	// x: [XLEFTBOUND, XRIGHTBOUND - 1],
+	// y: [YLEFTBOUND, YRIGHTBOUND - 1],
+	// z: [ZLEFTBOUND, ZRIGHTBOUND - 1]
 
 	Cell* grid3d;
 	float gameTimeElapsed;
@@ -81,21 +80,7 @@ private:
 	float GetWaterCapacity(const int& index);
 	int GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> cellPosition);
 	const std::unique_ptr<FIntVector> TranslateCellCoordinatesToLocal(std::unique_ptr<FIntVector> cellPosition);
-	FVector* GetCellPositionFromIndex(int index);
-	int GetXCoordFromCellIndex(int index);
-	int GetYCoordFromCellIndex(int index);
-	int GetZCoordFromCellIndex(int index);
 
-	int GetTopNeighborIndex(const int& index);
-	int GetFrontNeighborIndex(const int& index);
-	int GetFrontRightNeighborIndex(const int& index); //by diagonal
-	int GetRightNeighborIndex(const int& index);
-	int GetRightBehindNeighborIndex(const int& index); //by diagonal
-	int GetBehindNeighborIndex(const int& index);
-	int GetBehindLeftNeighborIndex(const int& index); //by diagonal
-	int GetLeftNeighborIndex(const int& index);
-	int GetLeftFrontNeighborIndex(const int& index); //by diagonal
-	int GetBottomNeighborIndex(const int& index);
 	void UpdateWaterCubePosition(const int& index);
 	void MoveTheWaterCube(const int& fromIndex, const int& toIndex);
 #pragma region Physics

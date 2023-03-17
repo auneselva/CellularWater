@@ -12,7 +12,7 @@ float AWaterCube::GColorRange = AWaterCube::maxGColor - AWaterCube::minGColor;
 float AWaterCube::minBColor = 0.1f;
 float AWaterCube::maxBColor = 0.85f;
 float AWaterCube::BColorRange = AWaterCube::maxBColor - AWaterCube::minBColor;
-int AWaterCube::worldHeight = BOUND * 2;
+int AWaterCube::worldHeight = ZRIGHTBOUND - ZLEFTBOUND;
 float AWaterCube::capacityRange = std::max(0.0f, (float)((worldHeight - 1) * EXCEED_MODIFIER));
 
 AWaterCube::AWaterCube() : currentWaterCapacity(BASE_CAPACITY), nextIterationWaterCapacity(BASE_CAPACITY), isCapacityUndetermined(false), clusterNum(0)

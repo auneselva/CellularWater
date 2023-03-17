@@ -2,6 +2,7 @@
 
 #include "WorldController.h"
 #include "WaterCube.h"
+#include "Grid3d.h"
 #include "Cell.h"
 #include <vector>
 #include <algorithm>
@@ -12,20 +13,14 @@ AWorldController::AWorldController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	defaultRotation = new FRotator3d();
-	XLeftBound = -BOUND;
-	XRightBound = BOUND;
-	YLeftBound = -BOUND;
-	YRightBound = BOUND;
-	ZLeftBound = -BOUND;
-	ZRightBound = BOUND;
-	xNCells = XRightBound - XLeftBound;
-	yNCells = YRightBound - YLeftBound;
-	zNCells = ZRightBound - ZLeftBound;
-	xyNCells = (XRightBound - XLeftBound) * (YRightBound - YLeftBound);
+	xNCells = XRIGHTBOUND - XLEFTBOUND;
+	yNCells = YRIGHTBOUND - YLEFTBOUND;
+	zNCells = ZRIGHTBOUND - ZLEFTBOUND;
+	xyNCells = (XRIGHTBOUND - XLEFTBOUND) * (YRIGHTBOUND - YLEFTBOUND);
 
 	grid3d = new Cell[N_CELLS];
 	for (int i = 0; i < N_CELLS; i++) {
-		grid3d[i].CalculatePosition(i, CELL_SIZE, XLeftBound, XRightBound, YLeftBound, YRightBound, ZLeftBound, ZRightBound);
+		grid3d[i].CalculatePosition(i, CELL_SIZE, XLEFTBOUND, XRIGHTBOUND, YLEFTBOUND, YRIGHTBOUND, ZLEFTBOUND, ZRIGHTBOUND);
 		
 	}
 	//SpawnWorldBorders();
@@ -50,23 +45,23 @@ void AWorldController::CreateWorldBorders() {
 	// 12 orange lines
 
 	//down 
-	SpawnWorldBorder(FVector(CELL_SIZE * (XLeftBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YRightBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XLEFTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YRIGHTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
 
 
 	// vertical
-	SpawnWorldBorder(FVector(CELL_SIZE * (XLeftBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XLeftBound - 0.5f), CELL_SIZE * (YRightBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YRightBound - 0.5f), CELL_SIZE * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XLEFTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XLEFTBOUND - 0.5f), CELL_SIZE * (YRIGHTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YRIGHTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)zNCells), FRotator3d(0.0f, 90.0f, 0.0f));
 
 	//up
-	SpawnWorldBorder(FVector(CELL_SIZE * (XLeftBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YRightBound - 0.5f), CELL_SIZE * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRightBound - 0.5f), CELL_SIZE * (YLeftBound - 0.5f), CELL_SIZE * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XLEFTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZRIGHTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZRIGHTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)yNCells), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YRIGHTBOUND - 0.5f), CELL_SIZE * ZRIGHTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
+	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZRIGHTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, (float)xNCells), FRotator3d(90.0f, 0.0f, 0.0f));
 
 
 }
@@ -86,15 +81,15 @@ int AWorldController::GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> 
 }
 const std::unique_ptr<FIntVector> AWorldController::TranslateCellCoordinatesToLocal(std::unique_ptr<FIntVector> cellPosition) {
 
-	return std::make_unique<FIntVector>(cellPosition->X - XLeftBound, cellPosition->Y - YLeftBound, cellPosition->Z - ZLeftBound);
+	return std::make_unique<FIntVector>(cellPosition->X - XLEFTBOUND, cellPosition->Y - YLEFTBOUND, cellPosition->Z - ZLEFTBOUND);
 }
 
 bool AWorldController::CheckIfInBoundaries(const int& x, const int& y, const int& z) {
-	if (x < XLeftBound || x > XRightBound - 1)
+	if (x < XLEFTBOUND || x > XRIGHTBOUND - 1)
 		return false;
-	else if (y < YLeftBound || y > YRightBound - 1)
+	else if (y < YLEFTBOUND || y > YRIGHTBOUND - 1)
 		return false;
-	else if (z < ZLeftBound || z > ZRightBound - 1)
+	else if (z < ZLEFTBOUND || z > ZRIGHTBOUND - 1)
 		return false;
 	return true;
 }
@@ -212,69 +207,6 @@ const UE::Math::TVector<double>* AWorldController::GetCellPosition(const int& in
 void AWorldController::DetachWaterCubeFromTheCell(const int& index) {
 	grid3d[index].WaterCube = nullptr;
 }
-int AWorldController::GetTopNeighborIndex(const int& index) {
-	int resultIndex = index + xyNCells;
-	return resultIndex;
-}
-
-int AWorldController::GetFrontNeighborIndex(const int& index) {
-	int resultIndex = index + xNCells;
-	// if outside bounds return -1 to let us know it is a blocking cell
-	if (resultIndex / xyNCells > index / xyNCells)
-		return -1;
-	return resultIndex;
-}
-int AWorldController::GetFrontRightNeighborIndex(const int& index) {
-	int frontIndex = GetFrontNeighborIndex(index);
-	int resultIndex = GetRightNeighborIndex(frontIndex);
-	return resultIndex;
-}
-int AWorldController::GetRightNeighborIndex(const int& index) {
-	int resultIndex = index - 1;
-	// if outside bounds return -1 to let us know it is a blocking cell
-	if (resultIndex / yNCells < index / yNCells)
-		return -1;
-	return resultIndex;
-}
-
-int AWorldController::GetRightBehindNeighborIndex(const int& index) {
-	int rightIndex = GetRightNeighborIndex(index);
-	int resultIndex = GetBehindNeighborIndex(rightIndex);
-	return resultIndex;
-}
-
-
-int AWorldController::GetBehindNeighborIndex(const int& index) {
-	int resultIndex = index - xNCells;
-	if (resultIndex / xyNCells < index / xyNCells)
-		return -1;
-	return resultIndex;
-}
-int AWorldController::GetBehindLeftNeighborIndex(const int& index) {
-	int behindIndex = GetBehindNeighborIndex(index);
-	int resultIndex = GetLeftNeighborIndex(behindIndex);
-	return resultIndex;
-}
-
-int AWorldController::GetLeftNeighborIndex(const int& index) {
-	int resultIndex = index + 1;
-	// if outside bounds return -1 to let us know it is a blocking cell
-	if (resultIndex / yNCells > index / yNCells)
-		return -1;
-	return resultIndex;
-}
-
-int AWorldController::GetLeftFrontNeighborIndex(const int& index) {
-	int leftIndex = GetLeftNeighborIndex(index);
-	int resultIndex = GetFrontNeighborIndex(leftIndex);
-	return resultIndex;
-}
-
-int AWorldController::GetBottomNeighborIndex(const int& index) {
-	int resultIndex = index - xyNCells;
-	return resultIndex;
-}
-
 
 void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
 {
@@ -300,7 +232,7 @@ void AWorldController::UpdateWaterCubePosition(const int& index) {
 void AWorldController::Gravity(const int& index) {
 
 	if (CanWaterFallDown(index)) {
-		int bottomIndex = GetBottomNeighborIndex(index);
+		int bottomIndex = Grid3d::GetBottomNeighborIndex(index, xyNCells);
 		if (GetWaterCubeIfVisible(bottomIndex) != nullptr) {
 			float waterAmountToBeFlown = GetWaterCapacity(bottomIndex) - GetCurrentWaterLevel(bottomIndex) - GetWaterSpilt(bottomIndex);
 			
@@ -367,27 +299,27 @@ void AWorldController::SpillAround(const int& index) {
 		std::vector<int> diagonalNeighbours;
 		diagonalNeighbours.reserve(4);
 		//UE_LOG(LogTemp, Warning, TEXT("Current index: %d"), index);
-		int rightIndex = GetRightNeighborIndex(index);
+		int rightIndex = Grid3d::GetRightNeighborIndex(index, yNCells);
 
 		if (IsNeighbourFreeToBeSpilledTo(index, rightIndex)) {
 			sideNeighbours.emplace_back(rightIndex);
 		}
-		int leftIndex = GetLeftNeighborIndex(index);
+		int leftIndex = Grid3d::GetLeftNeighborIndex(index, yNCells);
 		if (IsNeighbourFreeToBeSpilledTo(index, leftIndex)) {
 			sideNeighbours.emplace_back(leftIndex);
 		}
-		int frontIndex = GetFrontNeighborIndex(index);
+		int frontIndex = Grid3d::GetFrontNeighborIndex(index, xNCells, xyNCells);
 		if (IsNeighbourFreeToBeSpilledTo(index, frontIndex)) {
 			sideNeighbours.emplace_back(frontIndex);
 		}
-		int behindIndex = GetBehindNeighborIndex(index);
+		int behindIndex = Grid3d::GetBehindNeighborIndex(index, xNCells, xyNCells);
 		if (IsNeighbourFreeToBeSpilledTo(index, behindIndex)) {
 			sideNeighbours.emplace_back(behindIndex);
 		}
 
 		if (std::find(sideNeighbours.begin(), sideNeighbours.end(), frontIndex) != sideNeighbours.end()) {
 			if (std::find(sideNeighbours.begin(), sideNeighbours.end(), rightIndex) != sideNeighbours.end()) {
-				int frontRightIndex = GetRightNeighborIndex(frontIndex);
+				int frontRightIndex = Grid3d::GetRightNeighborIndex(frontIndex, yNCells);
 				if (IsNeighbourFreeToBeSpilledTo(index, frontRightIndex))
 					diagonalNeighbours.emplace_back(frontRightIndex);
 			}	
@@ -395,7 +327,7 @@ void AWorldController::SpillAround(const int& index) {
 
 		if (std::find(sideNeighbours.begin(), sideNeighbours.end(), rightIndex) != sideNeighbours.end()) {
 			if (std::find(sideNeighbours.begin(), sideNeighbours.end(), behindIndex) != sideNeighbours.end()) {
-				int rightBehindIndex = GetBehindNeighborIndex(rightIndex);
+				int rightBehindIndex = Grid3d::GetBehindNeighborIndex(rightIndex, xNCells, xyNCells);
 				if (IsNeighbourFreeToBeSpilledTo(index, rightBehindIndex))
 					diagonalNeighbours.emplace_back(rightBehindIndex);
 			}
@@ -403,7 +335,7 @@ void AWorldController::SpillAround(const int& index) {
 
 		if (std::find(sideNeighbours.begin(), sideNeighbours.end(), behindIndex) != sideNeighbours.end()) {
 			if (std::find(sideNeighbours.begin(), sideNeighbours.end(), leftIndex) != sideNeighbours.end()) {
-				int behindLeftIndex = GetLeftNeighborIndex(behindIndex);
+				int behindLeftIndex = Grid3d::GetLeftNeighborIndex(behindIndex, yNCells);
 				if (IsNeighbourFreeToBeSpilledTo(index, behindLeftIndex))
 					diagonalNeighbours.emplace_back(behindLeftIndex);
 			}
@@ -411,7 +343,7 @@ void AWorldController::SpillAround(const int& index) {
 
 		if (std::find(sideNeighbours.begin(), sideNeighbours.end(), rightIndex) != sideNeighbours.end()) {
 			if (std::find(sideNeighbours.begin(), sideNeighbours.end(), frontIndex) != sideNeighbours.end()) {
-				int frontRightIndex = GetFrontNeighborIndex(rightIndex);
+				int frontRightIndex = Grid3d::GetFrontNeighborIndex(rightIndex, xNCells, xyNCells);
 				if (IsNeighbourFreeToBeSpilledTo(index, frontRightIndex))
 					diagonalNeighbours.emplace_back(frontRightIndex);
 			}
@@ -458,7 +390,7 @@ bool AWorldController::IsNeighbourFreeToBeSpilledTo(const int& currentIndex, con
 	return false;
 }
 bool AWorldController::CanWaterFallDown(const int& currentIndex) {
-	int bottomIndex = GetBottomNeighborIndex(currentIndex);
+	int bottomIndex = Grid3d::GetBottomNeighborIndex(currentIndex, xyNCells);
 	if (CheckIfCellWIthinBounds(bottomIndex)) {
 		if (CheckIfBlockCell(bottomIndex))
 			return false;
@@ -471,7 +403,7 @@ bool AWorldController::CanWaterFallDown(const int& currentIndex) {
 }
 
 bool AWorldController::CanWaterSpillAround(const int& index) {
-	int bottomIndex = GetBottomNeighborIndex(index);
+	int bottomIndex = Grid3d::GetBottomNeighborIndex(index, xyNCells);
 	if (!CheckIfCellWIthinBounds(bottomIndex))
 		return true;
 	if (CheckIfBlockCell(bottomIndex))
@@ -532,7 +464,7 @@ void AWorldController::CalculateWaterCubeCapacity() {
 
 		bool checkingUpwards = true;
 		bool blockAbove = false;
-		int topIndex = GetTopNeighborIndex(i);
+		int topIndex = Grid3d::GetTopNeighborIndex(i, xyNCells);
 		while (true) {
 			if (!CheckIfCellWIthinBounds(topIndex)) {
 				break;
@@ -553,7 +485,7 @@ void AWorldController::CalculateWaterCubeCapacity() {
 			if (!CheckIfFullCapacityReached(topIndex, currentLevel)) {
 				break;
 			}
-			topIndex = GetTopNeighborIndex(topIndex);
+			topIndex = Grid3d::GetTopNeighborIndex(topIndex, xyNCells);
 		}
 
 		if (blockAbove) {
@@ -597,13 +529,13 @@ void AWorldController::CalculateWaterCubeCapacity() {
 bool AWorldController::SetByNeighbourWaterCapacityIfPresent(const int& index) {
 	float highestCapacity = 0.0f;
 	bool isWaterAround = false;
-	int leftIndex = GetLeftNeighborIndex(index);
+	int leftIndex = Grid3d::GetLeftNeighborIndex(index, yNCells);
 	GetHigherCapacity(highestCapacity, leftIndex, isWaterAround);
-	int frontIndex = GetFrontNeighborIndex(index);
+	int frontIndex = Grid3d::GetFrontNeighborIndex(index, xNCells, xyNCells);
 	GetHigherCapacity(highestCapacity, frontIndex, isWaterAround);
-	int rightIndex = GetRightNeighborIndex(index);
+	int rightIndex = Grid3d::GetRightNeighborIndex(index, yNCells);
 	GetHigherCapacity(highestCapacity, rightIndex, isWaterAround);
-	int behindIndex = GetBehindNeighborIndex(index);
+	int behindIndex = Grid3d::GetBehindNeighborIndex(index, xNCells, xyNCells);
 	GetHigherCapacity(highestCapacity, behindIndex, isWaterAround);
 	if (highestCapacity > BASE_CAPACITY - PRECISION_OFFSET) {
 		grid3d[index].WaterCube->nextIterationWaterCapacity = highestCapacity;
@@ -698,7 +630,7 @@ void AWorldController::TraverseAdjacentWaters(const int& currentCluster, const i
 		waterCubesToTraverse.pop_back();
 
 		//check all 4 neighbours
-		int leftIndex = GetLeftNeighborIndex(currIdx);
+		int leftIndex = Grid3d::GetLeftNeighborIndex(currIdx, yNCells);
 		if (CheckIfCellWIthinBounds(leftIndex)) {
 			AWaterCube* waterCube = GetWaterCubeIfVisible(leftIndex);
 			if (waterCube != nullptr && waterCube->clusterNum == 0) {
@@ -707,7 +639,7 @@ void AWorldController::TraverseAdjacentWaters(const int& currentCluster, const i
 			}
 		}
 
-		int rightIndex = GetRightNeighborIndex(currIdx);
+		int rightIndex = Grid3d::GetRightNeighborIndex(currIdx, yNCells);
 		if (CheckIfCellWIthinBounds(rightIndex)) {
 			AWaterCube* waterCube = GetWaterCubeIfVisible(rightIndex);
 			if (waterCube != nullptr && waterCube->clusterNum == 0) {
@@ -715,7 +647,7 @@ void AWorldController::TraverseAdjacentWaters(const int& currentCluster, const i
 				waterCube->clusterNum = currentCluster;
 			}
 		}
-		int frontIndex = GetFrontNeighborIndex(currIdx);
+		int frontIndex = Grid3d::GetFrontNeighborIndex(currIdx, xNCells, xyNCells);
 		if (CheckIfCellWIthinBounds(frontIndex)) {
 			AWaterCube* waterCube = GetWaterCubeIfVisible(frontIndex);
 			if (waterCube != nullptr && waterCube->clusterNum == 0) {
@@ -724,7 +656,7 @@ void AWorldController::TraverseAdjacentWaters(const int& currentCluster, const i
 			}
 		}
 
-		int behindIndex = GetBehindNeighborIndex(currIdx);
+		int behindIndex = Grid3d::GetBehindNeighborIndex(currIdx, xNCells, xyNCells);
 		if (CheckIfCellWIthinBounds(behindIndex)) {
 			AWaterCube* waterCube = GetWaterCubeIfVisible(behindIndex);
 			if (waterCube != nullptr && waterCube->clusterNum == 0) {
@@ -791,7 +723,7 @@ void AWorldController::FlowPressurizedWaterUpwards() {
 		if (GetCurrentWaterLevel(i) + GetWaterSpilt(i) < BASE_CAPACITY + PRECISION_OFFSET)
 			continue;
 
-		int topIndex = GetTopNeighborIndex(i);
+		int topIndex = Grid3d::GetTopNeighborIndex(i, xyNCells);
 		if (!CheckIfCellWIthinBounds(topIndex) || CheckIfBlockCell(topIndex))
 			continue;
 		//check if cube is pressurized
@@ -799,7 +731,7 @@ void AWorldController::FlowPressurizedWaterUpwards() {
 		float upShouldBeCapacity = std::clamp(currWaterCube->currentWaterCapacity - EXCEED_MODIFIER, BASE_CAPACITY, currWaterCube->currentWaterCapacity - EXCEED_MODIFIER);
 		float upFreeAmount = std::clamp(upShouldBeCapacity - upWaterLevel, 0.0f, upShouldBeCapacity - upWaterLevel);
 		float waterToFlowUp = std::clamp(GetCurrentWaterLevel(i) + GetWaterSpilt(i) - (float)BASE_CAPACITY, 0.0f, upFreeAmount);
-		UE_LOG(LogTemp, Warning, TEXT("WaterToflowup(%d): %f"), topIndex, waterToFlowUp);
+		//UE_LOG(LogTemp, Warning, TEXT("WaterToflowup(%d): %f"), topIndex, waterToFlowUp);
 
 		AddWaterSpilt(topIndex, waterToFlowUp);
 		AddWaterSpilt(i, -waterToFlowUp);
@@ -810,21 +742,21 @@ void AWorldController::FlowPressurizedWaterUpwards() {
 
 void AWorldController::FlowAccordingToPressure(const int& index) {
 
-	int leftIndex = GetLeftNeighborIndex(index);
+	int leftIndex = Grid3d::GetLeftNeighborIndex(index, yNCells);
 	float leftOverload = GetWaterOverloadInCell(leftIndex);
 	float leftWaterDiff = GetWaterAmountDiff(index, leftIndex);
 
-	int rightIndex = GetRightNeighborIndex(index);
+	int rightIndex = Grid3d::GetRightNeighborIndex(index, yNCells);
 	float rightOverload = GetWaterOverloadInCell(rightIndex);
 	float rightWaterDiff = GetWaterAmountDiff(index, rightIndex);
 
 	//double XOverload = rightOverload - leftOverload;
 
-	int frontIndex = GetFrontNeighborIndex(index);
+	int frontIndex = Grid3d::GetFrontNeighborIndex(index, xNCells, xyNCells);
 	float frontOverload = GetWaterOverloadInCell(frontIndex);
 	float frontWaterDiff = GetWaterAmountDiff(index, frontIndex);
 
-	int behindIndex = GetBehindNeighborIndex(index);
+	int behindIndex = Grid3d::GetBehindNeighborIndex(index, xNCells, xyNCells);
 	float behindOverload = GetWaterOverloadInCell(behindIndex);
 	float behindWaterDiff = GetWaterAmountDiff(index, behindIndex);
 
@@ -865,9 +797,9 @@ void AWorldController::FlowAccordingToPressure(const int& index) {
 	amountForIdx.clear();
 	//double YOverload = frontOverload - behindWaterDiff;
 
-	int topIndex = GetTopNeighborIndex(index);
+	int topIndex = Grid3d::GetTopNeighborIndex(index, xyNCells);
 	float topOverload = GetWaterOverloadInCell(topIndex);
-	int bottomIndex = GetBottomNeighborIndex(index);
+	int bottomIndex = Grid3d::GetBottomNeighborIndex(index, xyNCells);
 	float bottomOverload = GetWaterOverloadInCell(bottomIndex);
 
 	double ZOverload = topOverload - bottomOverload;
@@ -900,28 +832,28 @@ void AWorldController::FlowAccordingToPressure(const int& index) {
 
 void AWorldController::EvaluateFlowFromNeighbours(const int& index) {
 
-	int leftIndex = GetLeftNeighborIndex(index);
+	int leftIndex = Grid3d::GetLeftNeighborIndex(index, yNCells);
 	float leftOverload = GetWaterOverloadInCell(leftIndex);
 	float leftWaterDiff = GetWaterAmountDiff(index, leftIndex);
-	int rightIndex = GetRightNeighborIndex(index);
+	int rightIndex = Grid3d::GetRightNeighborIndex(index, yNCells);
 	float rightOverload = GetWaterOverloadInCell(rightIndex);
 	float rightWaterDiff = GetWaterAmountDiff(index, rightIndex);
 
 	double XOverload = rightOverload - leftOverload;
 
-	int frontIndex = GetFrontNeighborIndex(index);
+	int frontIndex = Grid3d::GetFrontNeighborIndex(index, xNCells, xyNCells);
 	float frontOverload = GetWaterOverloadInCell(frontIndex);
 	float frontWaterDiff = GetWaterAmountDiff(index, frontIndex);
 
-	int behindIndex = GetBehindNeighborIndex(index);
+	int behindIndex = Grid3d::GetBehindNeighborIndex(index, xNCells, xyNCells);
 	float behindOverload = GetWaterOverloadInCell(behindIndex);
 	float behindWaterDiff = GetWaterAmountDiff(index, behindIndex);
 
 	double YOverload = frontOverload - behindWaterDiff;
 
-	int topIndex = GetTopNeighborIndex(index);
+	int topIndex = Grid3d::GetTopNeighborIndex(index, xyNCells);
 	float topOverload = GetWaterOverloadInCell(topIndex);
-	int bottomIndex = GetBottomNeighborIndex(index);
+	int bottomIndex = Grid3d::GetBottomNeighborIndex(index, xyNCells);
 	float bottomOverload = GetWaterOverloadInCell(bottomIndex);
 
 	double ZOverload = topOverload - bottomOverload;
