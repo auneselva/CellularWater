@@ -18,11 +18,6 @@ AWorldController::AWorldController()
 	zNCells = ZRIGHTBOUND - ZLEFTBOUND;
 	xyNCells = (XRIGHTBOUND - XLEFTBOUND) * (YRIGHTBOUND - YLEFTBOUND);
 
-	grid3d = new Cell[N_CELLS];
-	for (int i = 0; i < N_CELLS; i++) {
-		grid3d[i].CalculatePosition(i, CELL_SIZE, XLEFTBOUND, XRIGHTBOUND, YLEFTBOUND, YRIGHTBOUND, ZLEFTBOUND, ZRIGHTBOUND);
-		
-	}
 	//SpawnWorldBorders();
 	//UE_LOG(LogTemp, Warning, TEXT("Grid3d %d"), grid3d[7999].WaterCube );
 
@@ -30,6 +25,14 @@ AWorldController::AWorldController()
 void AWorldController::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+
+	grid3d = new Cell[N_CELLS];
+	for (int i = 0; i < N_CELLS; i++) {
+		grid3d[i].CalculatePosition(i, CELL_SIZE, XLEFTBOUND, XRIGHTBOUND, YLEFTBOUND, YRIGHTBOUND, ZLEFTBOUND, ZRIGHTBOUND);
+		
+	}
 
 	gameTimeElapsed = 0;
 	simCounter = 0;
@@ -204,10 +207,6 @@ const UE::Math::TVector<double>* AWorldController::GetCellPosition(const int& in
 	return grid3d[index].GetPosition();
 }
 
-void AWorldController::DetachWaterCubeFromTheCell(const int& index) {
-	grid3d[index].WaterCube = nullptr;
-}
-
 void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
 {
 	Super::Tick(DeltaTime);
@@ -220,15 +219,6 @@ void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
 		
 }
 
-void AWorldController::MoveTheWaterCube(const int& fromIndex, const int& toIndex) {
-	SetWaterCubeInTheGrid(grid3d[fromIndex].WaterCube, toIndex);
-	DetachWaterCubeFromTheCell(fromIndex);
-	UpdateWaterCubePosition(toIndex);
-}
-
-void AWorldController::UpdateWaterCubePosition(const int& index) {
-	grid3d[index].WaterCube->SetActorLocation(*grid3d[index].GetPosition());
-}
 void AWorldController::Gravity(const int& index) {
 
 	if (CanWaterFallDown(index)) {

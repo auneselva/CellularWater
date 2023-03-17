@@ -42,7 +42,6 @@ public:
 	void SetBlockCubeInTheGrid(int cellIndex);
 	void SetWaterLevel(const int& index, const float& waterLevel);
 	const UE::Math::TVector<double>* GetCellPosition(const int& index);
-	void DetachWaterCubeFromTheCell(const int& index);
 	virtual void Tick(float DeltaTime) override;
 
 protected:
@@ -80,9 +79,6 @@ private:
 	float GetWaterCapacity(const int& index);
 	int GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> cellPosition);
 	const std::unique_ptr<FIntVector> TranslateCellCoordinatesToLocal(std::unique_ptr<FIntVector> cellPosition);
-
-	void UpdateWaterCubePosition(const int& index);
-	void MoveTheWaterCube(const int& fromIndex, const int& toIndex);
 #pragma region Physics
 	void Gravity(const int& index);
 	void SpillAround(const int& index);
