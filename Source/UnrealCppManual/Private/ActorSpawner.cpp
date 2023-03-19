@@ -7,7 +7,7 @@
 #include "BlockCube.h"
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include <WorldBorder.h>
-
+#include "Grid3d.h"
 // Sets default values
 AActorSpawner::AActorSpawner()
 {
@@ -25,31 +25,35 @@ AActorSpawner::~AActorSpawner() {
 void AActorSpawner::SpawnWaterCube()
 {
 	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(spawner->GetActorLocation());
-	const int& cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
+	const int& cellIndex = Grid3d::GetInstance()->GetCellIndexAtFloatPosition(SpawnerLocation);
 
-	if (worldController->CheckIfCellFree(cellIndex))
+	if (Grid3d::GetInstance()->CheckIfCellFree(cellIndex))
 	{
-		if (worldController->GetWaterCubeIfPresent(cellIndex) != nullptr)
-			worldController->SetWaterCubeVisibility(cellIndex, true);
+		if (Grid3d::GetInstance()->GetWaterCubeIfPresent(cellIndex) != nullptr)
+			Grid3d::GetInstance()->SetWaterCubeVisibility(cellIndex, true);
 		else
 		{
-			AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*worldController->GetCellPosition(cellIndex), *defaultRotation);
-			worldController->SetWaterCubeInTheGrid(newCube, cellIndex);
+			AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*Grid3d::GetInstance()->GetCellPosition(cellIndex), *defaultRotation);
+			Grid3d::GetInstance()->SetWaterCubeInTheGrid(newCube, cellIndex);
 		}
-		worldController->SetWaterLevel(cellIndex, 1.0f);
+		Grid3d::GetInstance()->SetWaterLevel(cellIndex, 1.0f);
 	}
 }
 
 void AActorSpawner::SpawnBlockCube()
 {
 	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(spawner->GetActorLocation());
-	const int& cellIndex = worldController->GetCellIndexAtFloatPosition(SpawnerLocation);
+	const int& cellIndex = Grid3d::GetInstance()->GetCellIndexAtFloatPosition(SpawnerLocation);
 
-	if (worldController->CheckIfCellFree(cellIndex))
+	if (Grid3d::GetInstance()->CheckIfCellFree(cellIndex))
 	{
-		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*worldController->GetCellPosition(cellIndex), *defaultRotation);
-		worldController->SetBlockCubeInTheGrid(cellIndex);
+		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*Grid3d::GetInstance()->GetCellPosition(cellIndex), *defaultRotation);
+		Grid3d::GetInstance()->SetBlockCubeInTheGrid(cellIndex);
 	}
 }
+void AActorSpawner::SpawnWorldBorder(FVector spawn, UE::Math::TVector<double> scale, FRotator3d rotator) {
 
+	AWorldBorder* worldBorder = GetWorld()->SpawnActor<AWorldBorder>(spawn, rotator);
+	worldBorder->SetActorScale3D(std::move(scale));
+}
 

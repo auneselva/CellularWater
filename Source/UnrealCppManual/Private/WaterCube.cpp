@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <string>
 #include <WorldController.h>
+#include "Grid3d.h"
 
 float AWaterCube::minGColor = 0.05f;
 float AWaterCube::maxGColor = 0.2f;

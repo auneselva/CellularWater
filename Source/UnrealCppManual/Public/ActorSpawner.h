@@ -10,7 +10,7 @@ UCLASS()
 class UNREALCPPMANUAL_API AActorSpawner: public AActor
 {
     GENERATED_BODY()
-    
+
 public:
     // Sets default values for this actor's properties
     AActorSpawner();
@@ -21,6 +21,7 @@ public:
         void SpawnWaterCube();
     UFUNCTION()
         void SpawnBlockCube();
+    void SpawnWorldBorder(FVector spawn, UE::Math::TVector<double> scale, FRotator3d rotator);
     UPROPERTY(EditAnywhere)
         AActor* spawner;
     FRotator3d* defaultRotation;
