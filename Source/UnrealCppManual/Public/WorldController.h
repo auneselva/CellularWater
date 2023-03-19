@@ -22,8 +22,6 @@ public:
 	~AWorldController();
 	FRotator3d* defaultRotation;
 	virtual void Tick(float DeltaTime) override;
-	void CreateWorldBorders();
-	void SpawnWorldBorder(FVector spawn, UE::Math::TVector<double> scale, FRotator3d rotator);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -14,10 +14,8 @@
 AWorldController::AWorldController()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	defaultRotation = new FRotator3d();
+	defaultRotation = new FRotator3d(0,0,0);
 	Grid3d::GetInstance();
-	//SpawnWorldBorders();
-	//UE_LOG(LogTemp, Warning, TEXT("Grid3d %d"), grid3d[7999].WaterCube );
 
 }
 void AWorldController::BeginPlay()
@@ -26,43 +24,11 @@ void AWorldController::BeginPlay()
 
 	gameTimeElapsed = 0;
 	simCounter = 0;
-	CreateWorldBorders();
 }
 AWorldController::~AWorldController()
 {
 	delete defaultRotation;
 }
-
-void AWorldController::CreateWorldBorders() {
-	// 12 orange lines
-
-	//down 
-	SpawnWorldBorder(FVector(CELL_SIZE * (XLEFTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, YNCELLS), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, YNCELLS), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YRIGHTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, XNCELLS), FRotator3d(90.0f, 0.0f, 0.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, XNCELLS), FRotator3d(90.0f, 0.0f, 0.0f));
-
-
-	// vertical
-	SpawnWorldBorder(FVector(CELL_SIZE * (XLEFTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, ZNCELLS), FRotator3d(0.0f, 90.0f, 0.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, ZNCELLS), FRotator3d(0.0f, 90.0f, 0.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XLEFTBOUND - 0.5f), CELL_SIZE * (YRIGHTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, ZNCELLS), FRotator3d(0.0f, 90.0f, 0.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YRIGHTBOUND - 0.5f), CELL_SIZE * ZLEFTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, ZNCELLS), FRotator3d(0.0f, 90.0f, 0.0f));
-
-	//up
-	SpawnWorldBorder(FVector(CELL_SIZE * (XLEFTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZRIGHTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, YNCELLS), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZRIGHTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, YNCELLS), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YRIGHTBOUND - 0.5f), CELL_SIZE * ZRIGHTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, XNCELLS), FRotator3d(90.0f, 0.0f, 0.0f));
-	SpawnWorldBorder(FVector(CELL_SIZE * (XRIGHTBOUND - 0.5f), CELL_SIZE * (YLEFTBOUND - 0.5f), CELL_SIZE * ZRIGHTBOUND), UE::Math::TVector<double>(0.1f, 0.1f, XNCELLS), FRotator3d(90.0f, 0.0f, 0.0f));
-
-
-}
-void AWorldController::SpawnWorldBorder(FVector spawn, UE::Math::TVector<double> scale, FRotator3d rotator) {
-
-	AWorldBorder* worldBorder = GetWorld()->SpawnActor<AWorldBorder>(spawn, rotator);
-	worldBorder->SetActorScale3D(std::move(scale));
-}
-
 
 void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
 {

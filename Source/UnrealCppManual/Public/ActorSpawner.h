@@ -22,11 +22,13 @@ public:
     UFUNCTION()
         void SpawnBlockCube();
     void SpawnWorldBorder(FVector spawn, UE::Math::TVector<double> scale, FRotator3d rotator);
+    void CreateWorldBorders();
     UPROPERTY(EditAnywhere)
         AActor* spawner;
     FRotator3d* defaultRotation;
-protected:
 
+protected:
+    virtual void BeginPlay() override;
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         class UBoxComponent* SpawnVolume;
 
