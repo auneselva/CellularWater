@@ -98,7 +98,7 @@ void AWorldController::ApplySimulationProccesses() {
 			UE_LOG(LogTemp, Warning, TEXT("GetCurrentWaterLevel(%d): %f, GetWaterSpilt() %f, GetWaterCapacity(): %f"), i, Grid3d::GetInstance()->GetCurrentWaterLevel(i), Grid3d::GetInstance()->GetWaterSpilt(i), Grid3d::GetInstance()->GetWaterCapacity(i));
 
 	HandleSpiltWater();
-	Grid3d::GetInstance()->AdjustWaterCubesTransformIfPresent();
+	Grid3d::GetInstance()->UpdateCubesTransform();
 }
 
 void AWorldController::SpillAround(const int& index) {

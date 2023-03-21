@@ -232,7 +232,7 @@ const UE::Math::TVector<double>* Grid3d::GetCellPosition(const int& index)
 	return grid3d[index].GetPosition();
 }
 
-void Grid3d::AdjustWaterCubesTransformIfPresent() {
+void Grid3d::UpdateCubesTransform() {
 	for (int i = 0; i < N_CELLS; i++) {
 		grid3d[i].AdjustWaterCubesTransformIfPresent(CELL_SIZE);
 	}

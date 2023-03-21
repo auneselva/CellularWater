@@ -73,6 +73,6 @@ public:
 	void AddWaterSpilt(const int& index, const float& amount);
 	void SetWaterSpilt(const int& index, const float& amount);
 	float GetWaterCapacity(const int& index);
-	void AdjustWaterCubesTransformIfPresent();
+	void UpdateCubesTransform();
 };
 
