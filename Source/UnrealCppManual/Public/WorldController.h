@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Cell.h"
 #include "GameFramework/Actor.h"
+#include "WaterSimGameInstance.h"
 #include "WorldController.generated.h"
 
 #define SIMULATION_SPEED 0.2
@@ -20,6 +21,7 @@ public:
 	// Sets default values for this actor's properties
 	AWorldController();
 	~AWorldController();
+	UWaterSimGameInstance* waterSimGameInstance;
 	FRotator3d* defaultRotation;
 	virtual void Tick(float DeltaTime) override;
 protected:

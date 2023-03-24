@@ -3,16 +3,15 @@
 #include "WorldController.h"
 #include "WaterCube.h"
 #include "Grid3d.h"
-#include "Cell.h"
 #include <vector>
 #include <algorithm>
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include "ActorSpawner.h"
 #include <WorldBorder.h>
 
-
 AWorldController::AWorldController()
 {
+	waterSimGameInstance = Cast<UWaterSimGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	PrimaryActorTick.bCanEverTick = true;
 	defaultRotation = new FRotator3d(0,0,0);
 	Grid3d::GetInstance();

@@ -4,12 +4,11 @@
 #include "Cell.h"
 #include "WorldBorder.h"
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
-
+#include <WaterSimGameInstance.h>
 
 Grid3d* Grid3d::grid3dInstance = nullptr;
 
 Grid3d::Grid3d() {
-
 	grid3d = new Cell[N_CELLS];
 	for (int i = 0; i < N_CELLS; i++) {
 		grid3d[i].CalculatePosition(i, CELL_SIZE, XLEFTBOUND, XRIGHTBOUND, YLEFTBOUND, YRIGHTBOUND, ZLEFTBOUND, ZRIGHTBOUND);

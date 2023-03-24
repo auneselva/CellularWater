@@ -25,6 +25,8 @@
 class UNREALCPPMANUAL_API Grid3d
 {
 private:
+
+	
 	Grid3d();
 	~Grid3d();
 	Grid3d(Grid3d& other) = delete;
