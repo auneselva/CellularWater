@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include <UnrealCppManual/Public/CameraPawn.h>
 #include "WorldController.h"
+#include "WaterSimGameInstance.h"
 #include "ActorSpawner.generated.h"
 
 UCLASS()
@@ -28,6 +29,9 @@ public:
     FRotator3d* defaultRotation;
 
 protected:
+
+    UWaterSimGameInstance* waterSimGameInstance;
+
     virtual void BeginPlay() override;
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         class UBoxComponent* SpawnVolume;

@@ -6,19 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Cell.h"
 #include "WorldBorder.h"
+#include "WaterSimGameInstance.h"
 
-#define BOUND 3
-#define XLEFTBOUND -BOUND
-#define XRIGHTBOUND BOUND
-#define YLEFTBOUND -BOUND
-#define YRIGHTBOUND BOUND
-#define ZLEFTBOUND -BOUND
-#define ZRIGHTBOUND BOUND
-#define N_CELLS (XRIGHTBOUND - XLEFTBOUND) * (YRIGHTBOUND - YLEFTBOUND) * (ZRIGHTBOUND - ZLEFTBOUND)
-#define XNCELLS (XRIGHTBOUND - XLEFTBOUND)
-#define YNCELLS (YRIGHTBOUND - YLEFTBOUND)
-#define ZNCELLS (ZRIGHTBOUND - ZLEFTBOUND)
-#define XYNCELLS ((XRIGHTBOUND - XLEFTBOUND) * (YRIGHTBOUND - YLEFTBOUND))
 #define CELL_SIZE 100.0
 #define PRECISION_OFFSET 0.00001
 
@@ -27,26 +16,36 @@ class UNREALCPPMANUAL_API Grid3d
 private:
 
 	
-	Grid3d();
+	Grid3d(const UWaterSimGameInstance& waterSimGameInstance);
 	~Grid3d();
 	Grid3d(Grid3d& other) = delete;
 	void operator=(const Grid3d&) = delete;
 	static Grid3d* grid3dInstance;
 	Cell* grid3d;
 
+
 public:
 
-	static Grid3d* Grid3d::GetInstance();
+	static Grid3d* Grid3d::GetInstance(const UWaterSimGameInstance &waterSimGameInstance);
+
 	int xNCells;
 	int yNCells;
 	int zNCells;
 	int xyNCells;
-	static int GetTopNeighborIndex(const int& index);
-	static int GetFrontNeighborIndex(const int& index);
-	static int GetRightNeighborIndex(const int& index);
-	static int GetBehindNeighborIndex(const int& index);
-	static int GetLeftNeighborIndex(const int& index);
-	static int GetBottomNeighborIndex(const int& index);
+	int NCells;
+
+	int XLeftBound;
+	int XRightBound;
+	int YLeftBound;
+	int YRightBound;
+	int ZLeftBound;
+	int ZRightBound;
+	int GetTopNeighborIndex(const int& index);
+	int GetFrontNeighborIndex(const int& index);
+	int GetRightNeighborIndex(const int& index);
+	int GetBehindNeighborIndex(const int& index);
+	int GetLeftNeighborIndex(const int& index);
+	int GetBottomNeighborIndex(const int& index);
 	int GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> cellPosition);
 	const std::unique_ptr<FIntVector> TranslateCellCoordinatesToLocal(std::unique_ptr<FIntVector> cellPosition);
 	bool CheckIfInBoundaries(const int& x, const int& y, const int& z);

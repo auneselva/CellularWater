@@ -6,15 +6,13 @@
 #include <string>
 #include <WorldController.h>
 #include "Grid3d.h"
-
+#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 float AWaterCube::minGColor = 0.05f;
 float AWaterCube::maxGColor = 0.2f;
 float AWaterCube::GColorRange = AWaterCube::maxGColor - AWaterCube::minGColor;
 float AWaterCube::minBColor = 0.1f;
 float AWaterCube::maxBColor = 0.85f;
 float AWaterCube::BColorRange = AWaterCube::maxBColor - AWaterCube::minBColor;
-int AWaterCube::worldHeight = ZRIGHTBOUND - ZLEFTBOUND;
-float AWaterCube::capacityRange = std::max(0.0f, (float)((worldHeight - 1) * EXCEED_MODIFIER));
 
 AWaterCube::AWaterCube() : currentWaterCapacity(BASE_CAPACITY), nextIterationWaterCapacity(BASE_CAPACITY), isCapacityUndetermined(false), clusterNum(0)
 {
@@ -47,6 +45,8 @@ int AWaterCube::GetCurrentGridIndex() {
 // Called when the game starts or when spawned
 void AWaterCube::BeginPlay()
 {
+	int worldHeight = Cast<UWaterSimGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->ZCells;
+	capacityRange = std::max(0.0f, (float)((worldHeight - 1) * EXCEED_MODIFIER));
 	Super::BeginPlay();
 	colorRaising = true;
 

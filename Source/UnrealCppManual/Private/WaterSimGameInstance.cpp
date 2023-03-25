@@ -6,9 +6,6 @@
 
 UWaterSimGameInstance::UWaterSimGameInstance() {
 	SimulationParameters.Init(0, 3);
-	XCells = 10;
-	YCells = 10;
-	ZCells = 10;
 }
 UWaterSimGameInstance::~UWaterSimGameInstance() {
 }

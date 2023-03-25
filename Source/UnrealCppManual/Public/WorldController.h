@@ -21,7 +21,7 @@ public:
 	// Sets default values for this actor's properties
 	AWorldController();
 	~AWorldController();
-	UWaterSimGameInstance* waterSimGameInstance;
+	class UWaterSimGameInstance* waterSimGameInstance;
 	FRotator3d* defaultRotation;
 	virtual void Tick(float DeltaTime) override;
 protected:

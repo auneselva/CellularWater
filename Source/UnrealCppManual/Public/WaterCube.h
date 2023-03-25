@@ -34,8 +34,7 @@ public:
 	static float maxBColor;
 	static float BColorRange;
 
-	static int worldHeight;
-	static float capacityRange;
+	float capacityRange;
 	
 	float currentWaterCapacity;
 	float nextIterationWaterCapacity;

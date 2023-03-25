@@ -8,10 +8,24 @@
 
 Grid3d* Grid3d::grid3dInstance = nullptr;
 
-Grid3d::Grid3d() {
-	grid3d = new Cell[N_CELLS];
-	for (int i = 0; i < N_CELLS; i++) {
-		grid3d[i].CalculatePosition(i, CELL_SIZE, XLEFTBOUND, XRIGHTBOUND, YLEFTBOUND, YRIGHTBOUND, ZLEFTBOUND, ZRIGHTBOUND);
+Grid3d::Grid3d(const UWaterSimGameInstance& waterSimGameInstance) {
+	xNCells = waterSimGameInstance.XCells;
+	UE_LOG(LogTemp, Warning, TEXT("GridxNCells %d"), waterSimGameInstance.XCells);
+	yNCells = waterSimGameInstance.YCells;
+	zNCells = waterSimGameInstance.ZCells;
+	xyNCells = xNCells * yNCells;
+	XLeftBound = -xNCells / 2 - 1;
+	XRightBound = XLeftBound + xNCells;
+	YLeftBound = -yNCells / 2 - 1;
+	YRightBound = YLeftBound + yNCells;
+	ZLeftBound = -zNCells / 2 - 1;
+	ZRightBound = ZLeftBound + zNCells;
+	NCells = xNCells * yNCells * zNCells;
+
+
+	grid3d = new Cell[NCells];
+	for (int i = 0; i < NCells; i++) {
+		grid3d[i].CalculatePosition(i, CELL_SIZE, XLeftBound, XRightBound, YLeftBound, YRightBound, ZLeftBound, ZRightBound);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Grid created")); 
 }
@@ -20,38 +34,38 @@ Grid3d::~Grid3d() {
 	delete[] grid3d;
 }
 
-Grid3d* Grid3d::GetInstance()
+Grid3d* Grid3d::GetInstance(const UWaterSimGameInstance& waterSimGameInstance)
 {
 	if (grid3dInstance == nullptr) {
-		grid3dInstance = new Grid3d();
+		grid3dInstance = new Grid3d(waterSimGameInstance);
 	}
 	return grid3dInstance;
 }
 
 
 int Grid3d::GetTopNeighborIndex(const int& index) {
-	int resultIndex = index + XYNCELLS;
+	int resultIndex = index + Grid3d::xyNCells;
 	return resultIndex;
 }
 
 int Grid3d::GetFrontNeighborIndex(const int& index) {
-	int resultIndex = index + XNCELLS;
+	int resultIndex = index + xNCells;
 	// if outside bounds return -1 to let us know it is a blocking cell
-	if (resultIndex / XYNCELLS > index / XYNCELLS)
+	if (resultIndex / xyNCells > index / xyNCells)
 		return -1;
 	return resultIndex;
 }
 int Grid3d::GetRightNeighborIndex(const int& index) {
 	int resultIndex = index - 1;
 	// if outside bounds return -1 to let us know it is a blocking cell
-	if (resultIndex / YNCELLS < index / YNCELLS)
+	if (resultIndex / yNCells < index / yNCells)
 		return -1;
 	return resultIndex;
 }
 
 int Grid3d::GetBehindNeighborIndex(const int& index) {
-	int resultIndex = index - XNCELLS;
-	if (resultIndex / XYNCELLS < index / XYNCELLS)
+	int resultIndex = index - xNCells;
+	if (resultIndex / xyNCells < index / xyNCells)
 		return -1;
 	return resultIndex;
 }
@@ -59,13 +73,13 @@ int Grid3d::GetBehindNeighborIndex(const int& index) {
 int Grid3d::GetLeftNeighborIndex(const int& index) {
 	int resultIndex = index + 1;
 	// if outside bounds return -1 to let us know it is a blocking cell
-	if (resultIndex / YNCELLS > index / YNCELLS)
+	if (resultIndex / yNCells > index / yNCells)
 		return -1;
 	return resultIndex;
 }
 
 int Grid3d::GetBottomNeighborIndex(const int& index) {
-	int resultIndex = index - XYNCELLS;
+	int resultIndex = index - xyNCells;
 	return resultIndex;
 }
 
@@ -75,19 +89,19 @@ int Grid3d::GetCellIndexAtSnappedPosition(std::unique_ptr<FIntVector> cellPositi
 		return -1;
 	}
 	const std::unique_ptr<FIntVector> localCoordinates = TranslateCellCoordinatesToLocal(std::move(cellPosition));
-	return localCoordinates->X + XNCELLS * localCoordinates->Y + XYNCELLS * localCoordinates->Z;
+	return localCoordinates->X + xNCells * localCoordinates->Y + xyNCells * localCoordinates->Z;
 }
 const std::unique_ptr<FIntVector> Grid3d::TranslateCellCoordinatesToLocal(std::unique_ptr<FIntVector> cellPosition) {
 
-	return std::make_unique<FIntVector>(cellPosition->X - XLEFTBOUND, cellPosition->Y - YLEFTBOUND, cellPosition->Z - ZLEFTBOUND);
+	return std::make_unique<FIntVector>(cellPosition->X - XLeftBound, cellPosition->Y - YLeftBound, cellPosition->Z - ZLeftBound);
 }
 
 bool Grid3d::CheckIfInBoundaries(const int& x, const int& y, const int& z) {
-	if (x < XLEFTBOUND || x > XRIGHTBOUND - 1)
+	if (x < XLeftBound || x > XRightBound - 1)
 		return false;
-	else if (y < YLEFTBOUND || y > YRIGHTBOUND - 1)
+	else if (y < YLeftBound || y > YRightBound - 1)
 		return false;
-	else if (z < ZLEFTBOUND || z > ZRIGHTBOUND - 1)
+	else if (z < ZLeftBound || z > ZRightBound - 1)
 		return false;
 	return true;
 }
@@ -117,7 +131,7 @@ bool Grid3d::CheckIfCellFree(const int& cellIndex) {
 }
 
 bool Grid3d::CheckIfCellWIthinBounds(const int& index) {
-	return (index > -1 && index < N_CELLS);
+	return (index > -1 && index < NCells);
 }
 
 bool Grid3d::CheckIfBlockCell(const int& index) {
@@ -232,7 +246,7 @@ const UE::Math::TVector<double>* Grid3d::GetCellPosition(const int& index)
 }
 
 void Grid3d::UpdateCubesTransform() {
-	for (int i = 0; i < N_CELLS; i++) {
+	for (int i = 0; i < NCells; i++) {
 		grid3d[i].AdjustWaterCubesTransformIfPresent(CELL_SIZE);
 	}
 }
