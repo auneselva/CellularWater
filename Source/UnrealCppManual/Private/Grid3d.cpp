@@ -22,10 +22,10 @@ Grid3d::Grid3d(const UWaterSimGameInstance& waterSimGameInstance) {
 	ZRightBound = ZLeftBound + zNCells;
 	NCells = xNCells * yNCells * zNCells;
 
-
+	CellSize = waterSimGameInstance.CellSize;
 	grid3d = new Cell[NCells];
 	for (int i = 0; i < NCells; i++) {
-		grid3d[i].CalculatePosition(i, CELL_SIZE, XLeftBound, XRightBound, YLeftBound, YRightBound, ZLeftBound, ZRightBound);
+		grid3d[i].CalculatePosition(i, CellSize, XLeftBound, XRightBound, YLeftBound, YRightBound, ZLeftBound, ZRightBound);
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Grid created")); 
 }
@@ -109,7 +109,7 @@ bool Grid3d::CheckIfInBoundaries(const int& x, const int& y, const int& z) {
 
 int Grid3d::GetCellIndexAtFloatPosition(std::shared_ptr<FVector> position) {
 
-	std::unique_ptr<FIntVector> gridTranslatedPosition = std::make_unique<FIntVector>((const int)(position->X / CELL_SIZE), (const int)(position->Y / CELL_SIZE), (const int)(position->Z / CELL_SIZE));
+	std::unique_ptr<FIntVector> gridTranslatedPosition = std::make_unique<FIntVector>((const int)(position->X / CellSize), (const int)(position->Y / CellSize), (const int)(position->Z / CellSize));
 
 	//UE_LOG(LogTemp, Warning, TEXT("gridTranslatedPosition: %d, %d, %d"), gridTranslatedPosition->X, gridTranslatedPosition->Y, gridTranslatedPosition->Z);
 	//UE_LOG(LogTemp, Warning, TEXT("spawnPositionPosition: %f, %f, %f"), spawnPosition->X, spawnPosition->Y, spawnPosition->Z);
@@ -247,6 +247,6 @@ const UE::Math::TVector<double>* Grid3d::GetCellPosition(const int& index)
 
 void Grid3d::UpdateCubesTransform() {
 	for (int i = 0; i < NCells; i++) {
-		grid3d[i].AdjustWaterCubesTransformIfPresent(CELL_SIZE);
+		grid3d[i].AdjustWaterCubesTransformIfPresent(CellSize);
 	}
 }

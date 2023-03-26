@@ -17,6 +17,8 @@ AWorldController::AWorldController()
 void AWorldController::BeginPlay()
 {
 	waterSimGameInstance = Cast<UWaterSimGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+
+	simThreshold = 1.0f / (float)waterSimGameInstance->SimulationSpeed * 2.0f;
 	Grid3d::GetInstance(*waterSimGameInstance);
 	Super::BeginPlay();
 
@@ -32,8 +34,9 @@ void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
 {
 	Super::Tick(DeltaTime);
 	gameTimeElapsed += DeltaTime;
-	if (gameTimeElapsed > SIMULATION_SPEED) {
-		gameTimeElapsed -= SIMULATION_SPEED;
+
+	if (gameTimeElapsed > simThreshold) {
+		gameTimeElapsed -= simThreshold;
 		ApplySimulationProccesses();
 		simCounter++;
 	}

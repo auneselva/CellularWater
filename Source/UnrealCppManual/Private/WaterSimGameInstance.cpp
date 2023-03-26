@@ -5,7 +5,7 @@
 
 
 UWaterSimGameInstance::UWaterSimGameInstance() {
-	SimulationParameters.Init(0, 3);
+	SimulationParameters.Init(0, 5);
 }
 UWaterSimGameInstance::~UWaterSimGameInstance() {
 }

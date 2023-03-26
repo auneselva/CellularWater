@@ -8,21 +8,18 @@
 #include "WorldBorder.h"
 #include "WaterSimGameInstance.h"
 
-#define CELL_SIZE 100.0
 #define PRECISION_OFFSET 0.00001
 
 class UNREALCPPMANUAL_API Grid3d
 {
 private:
 
-	
 	Grid3d(const UWaterSimGameInstance& waterSimGameInstance);
 	~Grid3d();
 	Grid3d(Grid3d& other) = delete;
 	void operator=(const Grid3d&) = delete;
 	static Grid3d* grid3dInstance;
 	Cell* grid3d;
-
 
 public:
 
@@ -40,6 +37,9 @@ public:
 	int YRightBound;
 	int ZLeftBound;
 	int ZRightBound;
+
+	int CellSize;
+
 	int GetTopNeighborIndex(const int& index);
 	int GetFrontNeighborIndex(const int& index);
 	int GetRightNeighborIndex(const int& index);

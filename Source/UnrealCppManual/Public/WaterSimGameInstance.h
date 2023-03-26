@@ -20,6 +20,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int ZCells;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int CellSize;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int SimulationSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<int> SimulationParameters;
 	UWaterSimGameInstance();
 	~UWaterSimGameInstance();

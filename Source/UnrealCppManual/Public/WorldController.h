@@ -7,7 +7,6 @@
 #include "WaterSimGameInstance.h"
 #include "WorldController.generated.h"
 
-#define SIMULATION_SPEED 0.2
 #define BASE_CAPACITY 1.0
 #define EXCEED_MODIFIER 0.02
 #define MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD 1.0
@@ -22,6 +21,8 @@ public:
 	AWorldController();
 	~AWorldController();
 	class UWaterSimGameInstance* waterSimGameInstance;
+	float simThreshold;
+
 	FRotator3d* defaultRotation;
 	virtual void Tick(float DeltaTime) override;
 protected:
