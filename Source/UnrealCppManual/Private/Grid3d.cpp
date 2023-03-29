@@ -11,6 +11,10 @@ Grid3d* Grid3d::grid3dInstance = nullptr;
 Grid3d::Grid3d(const UWaterSimGameInstance& waterSimGameInstance) {
 	xNCells = waterSimGameInstance.XCells;
 	UE_LOG(LogTemp, Warning, TEXT("GridxNCells %d"), waterSimGameInstance.XCells);
+	UE_LOG(LogTemp, Warning, TEXT("GridyNCells %d"), waterSimGameInstance.YCells);
+	UE_LOG(LogTemp, Warning, TEXT("GridzNCells %d"), waterSimGameInstance.ZCells);
+	UE_LOG(LogTemp, Warning, TEXT("GridCellSize %d"), waterSimGameInstance.CellSize);
+	UE_LOG(LogTemp, Warning, TEXT("GridSimSpeed %d"), waterSimGameInstance.SimulationSpeed);
 	yNCells = waterSimGameInstance.YCells;
 	zNCells = waterSimGameInstance.ZCells;
 	xyNCells = xNCells * yNCells;

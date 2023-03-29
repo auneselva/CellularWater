@@ -46,6 +46,8 @@ void AActorSpawner::SpawnWaterCube()
 		else
 		{
 			AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*Grid3d::GetInstance(*waterSimGameInstance)->GetCellPosition(cellIndex), *defaultRotation);
+			double scale = (double)Grid3d::GetInstance(*waterSimGameInstance)->CellSize / 100.0;
+			newCube->SetActorScale3D(UE::Math::TVector<double>(scale, scale, scale));
 			Grid3d::GetInstance(*waterSimGameInstance)->SetWaterCubeInTheGrid(newCube, cellIndex);
 		}
 		Grid3d::GetInstance(*waterSimGameInstance)->SetWaterLevel(cellIndex, 1.0f);
@@ -60,6 +62,8 @@ void AActorSpawner::SpawnBlockCube()
 	if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellFree(cellIndex))
 	{
 		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*Grid3d::GetInstance(*waterSimGameInstance)->GetCellPosition(cellIndex), *defaultRotation);
+		double scale = (double) Grid3d::GetInstance(*waterSimGameInstance)->CellSize / 100.0;
+		newCube->SetActorScale3D(UE::Math::TVector<double>(scale, scale, scale));
 		Grid3d::GetInstance(*waterSimGameInstance)->SetBlockCubeInTheGrid(cellIndex);
 	}
 }
