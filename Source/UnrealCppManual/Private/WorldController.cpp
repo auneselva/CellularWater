@@ -14,6 +14,12 @@ AWorldController::AWorldController()
 	defaultRotation = new FRotator3d(0,0,0);
 
 }
+
+AWorldController::~AWorldController()
+{
+	delete defaultRotation;
+}
+
 void AWorldController::BeginPlay()
 {
 	waterSimGameInstance = Cast<UWaterSimGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
@@ -24,10 +30,6 @@ void AWorldController::BeginPlay()
 
 	gameTimeElapsed = 0;
 	simCounter = 0;
-}
-AWorldController::~AWorldController()
-{
-	delete defaultRotation;
 }
 
 void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
@@ -41,23 +43,6 @@ void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
 		simCounter++;
 	}
 		
-}
-
-void AWorldController::Gravity(const int& index) {
-
-	if (CanWaterFallDown(index)) {
-		int bottomIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetBottomNeighborIndex(index);
-		if (Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(bottomIndex) != nullptr) {
-			float waterAmountToBeFlown = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCapacity(bottomIndex) - Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(bottomIndex) - Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(bottomIndex);
-			
-			Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(bottomIndex, waterAmountToBeFlown);
-			Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(index, -waterAmountToBeFlown);
-		}
-		else {
-			Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(bottomIndex, Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(index) + Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(index));
-			Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(index, -Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(index) - Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(index));
-		}
-	}
 }
 
 void AWorldController::ApplySimulationProccesses() {
@@ -101,6 +86,24 @@ void AWorldController::ApplySimulationProccesses() {
 	HandleSpiltWater();
 	Grid3d::GetInstance(*waterSimGameInstance)->UpdateCubesTransform();
 }
+
+void AWorldController::Gravity(const int& index) {
+
+	if (CanWaterFallDown(index)) {
+		int bottomIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetBottomNeighborIndex(index);
+		if (Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(bottomIndex) != nullptr) {
+			float waterAmountToBeFlown = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCapacity(bottomIndex) - Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(bottomIndex) - Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(bottomIndex);
+			
+			Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(bottomIndex, waterAmountToBeFlown);
+			Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(index, -waterAmountToBeFlown);
+		}
+		else {
+			Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(bottomIndex, Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(index) + Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(index));
+			Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(index, -Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(index) - Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(index));
+		}
+	}
+}
+
 
 void AWorldController::SpillAround(const int& index) {
 	//only spill water around if the cell below is occupied

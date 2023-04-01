@@ -19,10 +19,11 @@ AActorSpawner::AActorSpawner()
 
 	SpawnVolume->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
-	defaultScale = 100.0;
+	defaultScale = new double(100.0);
 	defaultRotation = new FRotator3d();
 }
 AActorSpawner::~AActorSpawner() {
+	delete defaultScale;
 	delete defaultRotation;
 }
 
@@ -46,7 +47,7 @@ void AActorSpawner::SpawnWaterCube()
 		else
 		{
 			AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*Grid3d::GetInstance(*waterSimGameInstance)->GetCellPosition(cellIndex), *defaultRotation);
-			double scale = (double)Grid3d::GetInstance(*waterSimGameInstance)->CellSize / 100.0;
+			double scale = (double)Grid3d::GetInstance(*waterSimGameInstance)->CellSize / *defaultScale;
 			newCube->SetActorScale3D(UE::Math::TVector<double>(scale, scale, scale));
 			Grid3d::GetInstance(*waterSimGameInstance)->SetWaterCubeInTheGrid(newCube, cellIndex);
 		}
@@ -62,7 +63,7 @@ void AActorSpawner::SpawnBlockCube()
 	if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellFree(cellIndex))
 	{
 		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*Grid3d::GetInstance(*waterSimGameInstance)->GetCellPosition(cellIndex), *defaultRotation);
-		double scale = (double) Grid3d::GetInstance(*waterSimGameInstance)->CellSize / 100.0;
+		double scale = (double) Grid3d::GetInstance(*waterSimGameInstance)->CellSize / *defaultScale;
 		newCube->SetActorScale3D(UE::Math::TVector<double>(scale, scale, scale));
 		Grid3d::GetInstance(*waterSimGameInstance)->SetBlockCubeInTheGrid(cellIndex);
 	}
@@ -88,23 +89,23 @@ void AActorSpawner::CreateWorldBorders() {
 	float CellSize = waterSimGameInstance->CellSize;
 
 	//down 
-	SpawnWorldBorder(FVector(CellSize * (XLeftBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, yNCells * CellSize / defaultScale), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, yNCells * CellSize / defaultScale), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YRightBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, xNCells * CellSize / defaultScale), FRotator3d(90.0f, 0.0f, 0.0f));
-	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, xNCells * CellSize / defaultScale), FRotator3d(90.0f, 0.0f, 0.0f));
+	SpawnWorldBorder(FVector(CellSize * (XLeftBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, yNCells * CellSize / *defaultScale), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, yNCells * CellSize / *defaultScale), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YRightBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, xNCells * CellSize / *defaultScale), FRotator3d(90.0f, 0.0f, 0.0f));
+	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, xNCells * CellSize / *defaultScale), FRotator3d(90.0f, 0.0f, 0.0f));
 
 
 	// vertical
-	SpawnWorldBorder(FVector(CellSize * (XLeftBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, zNCells * CellSize / defaultScale), FRotator3d(0.0f, 90.0f, 0.0f));
-	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, zNCells * CellSize / defaultScale), FRotator3d(0.0f, 90.0f, 0.0f));
-	SpawnWorldBorder(FVector(CellSize * (XLeftBound - 0.5f), CellSize * (YRightBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, zNCells * CellSize / defaultScale), FRotator3d(0.0f, 90.0f, 0.0f));
-	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YRightBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, zNCells * CellSize / defaultScale), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CellSize * (XLeftBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, zNCells * CellSize / *defaultScale), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, zNCells * CellSize / *defaultScale), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CellSize * (XLeftBound - 0.5f), CellSize * (YRightBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, zNCells * CellSize / *defaultScale), FRotator3d(0.0f, 90.0f, 0.0f));
+	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YRightBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, zNCells * CellSize / *defaultScale), FRotator3d(0.0f, 90.0f, 0.0f));
 
 	//up
-	SpawnWorldBorder(FVector(CellSize * (XLeftBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, yNCells * CellSize / defaultScale), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, yNCells * CellSize / defaultScale), FRotator3d(0.0f, 0.0f, 90.0f));
-	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YRightBound - 0.5f), CellSize * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, xNCells * CellSize / defaultScale), FRotator3d(90.0f, 0.0f, 0.0f));
-	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, xNCells * CellSize / defaultScale), FRotator3d(90.0f, 0.0f, 0.0f));
+	SpawnWorldBorder(FVector(CellSize * (XLeftBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, yNCells * CellSize / *defaultScale), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, yNCells * CellSize / *defaultScale), FRotator3d(0.0f, 0.0f, 90.0f));
+	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YRightBound - 0.5f), CellSize * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, xNCells * CellSize / *defaultScale), FRotator3d(90.0f, 0.0f, 0.0f));
+	SpawnWorldBorder(FVector(CellSize * (XRightBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZRightBound), UE::Math::TVector<double>(0.1f, 0.1f, xNCells * CellSize / *defaultScale), FRotator3d(90.0f, 0.0f, 0.0f));
 
 
 }

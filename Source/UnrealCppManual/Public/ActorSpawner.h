@@ -26,7 +26,7 @@ public:
     void CreateWorldBorders();
     UPROPERTY(EditAnywhere)
         AActor* spawner;
-    double defaultScale;
+    double* defaultScale;
     FRotator3d* defaultRotation;
 
 protected:
