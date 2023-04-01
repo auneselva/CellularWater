@@ -8,8 +8,6 @@
 #include "WorldBorder.h"
 #include "WaterSimGameInstance.h"
 
-#define PRECISION_OFFSET 0.00001
-
 class UNREALCPPMANUAL_API Grid3d
 {
 private:
