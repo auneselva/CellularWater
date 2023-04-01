@@ -27,7 +27,7 @@ ACameraPawn::ACameraPawn()
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 
 	//Assign SpringArm class variables.
-	SpringArmComp->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 50.0f), FRotator(-60.0f, 0.0f, 0.0f));
+	SpringArmComp->SetRelativeLocationAndRotation(FVector(-800.0f, 0.0f, 250.0f), FRotator(-60.0f, 0.0f, 0.0f));
 	SpringArmComp->TargetArmLength = 400.f;
 	SpringArmComp->bEnableCameraLag = true;
 	SpringArmComp->CameraLagSpeed = 3.0f;
