@@ -10,7 +10,6 @@
 #define BASE_CAPACITY 1.0
 #define EXCEED_MODIFIER 0.02
 #define MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD 1.0
-#define PRECISION_OFFSET 0.00001
 
 UCLASS()
 class UNREALCPPMANUAL_API AWorldController : public AActor
@@ -23,6 +22,7 @@ public:
 	~AWorldController();
 	class UWaterSimGameInstance* waterSimGameInstance;
 	float simThreshold;
+	float moreOftenSimThreshold;
 
 	FRotator3d* defaultRotation;
 	virtual void Tick(float DeltaTime) override;
@@ -38,6 +38,7 @@ private:
 	// z: [ZLEFTBOUND, ZRIGHTBOUND - 1]
 
 	float gameTimeElapsed;
+	float moreOftenGameTimeElapsed;
 	int simCounter;
 #pragma region Physics
 	void Gravity(const int& index);
@@ -61,6 +62,7 @@ private:
 	void FlowAccordingToPressure(const int& index);
 	void FlowPressurizedWaterUpwards();
 	float GetWaterOverloadInCell(const int& index);
+	float GetFreeAmountInCell(const int& index);
 	float GetWaterAmountDiff(const int& index, const int& neighbourIndex);
 #pragma endregion Physics
 };

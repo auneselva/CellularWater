@@ -248,6 +248,14 @@ const UE::Math::TVector<double>* Grid3d::GetCellPosition(const int& index)
 {
 	return grid3d[index].GetPosition();
 }
+/*
+bool Grid3d::GetCanWaterFlowHereState(const int& index) {
+	return grid3d[index].canWaterBeFallenHere;
+}
+
+void Grid3d::SetCanWaterFlowHereState(const int& index, bool state) {
+	grid3d[index].canWaterBeFallenHere = state;
+} */
 
 void Grid3d::UpdateCubesTransform() {
 	for (int i = 0; i < NCells; i++) {

@@ -25,10 +25,12 @@ void AWorldController::BeginPlay()
 	waterSimGameInstance = Cast<UWaterSimGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
 	simThreshold = 1.0f / (float)waterSimGameInstance->SimulationSpeed * 2.0f;
+	moreOftenSimThreshold = simThreshold / 5.0f;
 	Grid3d::GetInstance(*waterSimGameInstance);
 	Super::BeginPlay();
 
-	gameTimeElapsed = 0;
+	gameTimeElapsed = 0.0f;
+	moreOftenGameTimeElapsed = 0.0f;
 	simCounter = 0;
 }
 
@@ -36,13 +38,21 @@ void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
 {
 	Super::Tick(DeltaTime);
 	gameTimeElapsed += DeltaTime;
+	moreOftenGameTimeElapsed += DeltaTime;
 
 	if (gameTimeElapsed > simThreshold) {
 		gameTimeElapsed -= simThreshold;
 		ApplySimulationProccesses();
 		simCounter++;
 	}
-		
+	/*
+	if (moreOftenGameTimeElapsed > moreOftenSimThreshold) {
+		moreOftenGameTimeElapsed -= moreOftenSimThreshold;
+		FlowPressurizedWaterUpwards();
+		HandleSpiltWater();
+		Grid3d::GetInstance(*waterSimGameInstance)->UpdateCubesTransform();
+	}
+	*/
 }
 
 void AWorldController::ApplySimulationProccesses() {
@@ -77,6 +87,7 @@ void AWorldController::ApplySimulationProccesses() {
 			UE_LOG(LogTemp, Warning, TEXT("GetCurrentWaterLevel(%d): %f, GetWaterSpilt() %f, GetWaterCapacity(): %f"), i, Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(i), Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(i), Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCapacity(i));
 	
 	DetermineWaterFlow();
+
 	FlowPressurizedWaterUpwards();
 	//UE_LOG(LogTemp, Warning, TEXT("After Pressurizing"));
 	for (int i = 0; i < Grid3d::GetInstance(*waterSimGameInstance)->NCells; i++)
@@ -536,8 +547,9 @@ void AWorldController::FlowPressurizedWaterUpwards() {
 		AWaterCube* currWaterCube = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(i);
 		if (currWaterCube == nullptr)
 			continue;
-		if (Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(i) + Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(i) < BASE_CAPACITY + PRECISION_OFFSET)
+		if (Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(i) + Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(i) < BASE_CAPACITY + PRECISION_OFFSET) {
 			continue;
+		}
 
 		int topIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetTopNeighborIndex(i);
 		if (!Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellWIthinBounds(topIndex) || Grid3d::GetInstance(*waterSimGameInstance)->CheckIfBlockCell(topIndex))
@@ -548,6 +560,7 @@ void AWorldController::FlowPressurizedWaterUpwards() {
 		float upFreeAmount = std::clamp(upShouldBeCapacity - upWaterLevel, 0.0f, upShouldBeCapacity - upWaterLevel);
 		float waterToFlowUp = std::clamp(Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(i) + Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(i) - (float)BASE_CAPACITY, 0.0f, upFreeAmount);
 		//UE_LOG(LogTemp, Warning, TEXT("WaterToflowup(%d): %f"), topIndex, waterToFlowUp);
+
 
 		Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(topIndex, waterToFlowUp);
 		Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(i, -waterToFlowUp);
@@ -647,74 +660,80 @@ void AWorldController::FlowAccordingToPressure(const int& index) {
 }
 
 void AWorldController::EvaluateFlowFromNeighbours(const int& index) {
+	/*
+	if cell is overloaded with water spread to others
+	1. if neighbour is not a block cell flow there
+	2. how much? calculate all free neighbours and spread the overflowing amount in equal and flow there
 
-	int leftIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetLeftNeighborIndex(index);
-	float leftOverload = GetWaterOverloadInCell(leftIndex);
-	float leftWaterDiff = GetWaterAmountDiff(index, leftIndex);
-	int rightIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetRightNeighborIndex(index);
-	float rightOverload = GetWaterOverloadInCell(rightIndex);
-	float rightWaterDiff = GetWaterAmountDiff(index, rightIndex);
 
-	double XOverload = rightOverload - leftOverload;
 
-	int frontIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetFrontNeighborIndex(index);
-	float frontOverload = GetWaterOverloadInCell(frontIndex);
-	float frontWaterDiff = GetWaterAmountDiff(index, frontIndex);
-
-	int behindIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetBehindNeighborIndex(index);
-	float behindOverload = GetWaterOverloadInCell(behindIndex);
-	float behindWaterDiff = GetWaterAmountDiff(index, behindIndex);
-
-	double YOverload = frontOverload - behindWaterDiff;
-
-	int topIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetTopNeighborIndex(index);
-	float topOverload = GetWaterOverloadInCell(topIndex);
-	int bottomIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetBottomNeighborIndex(index);
-	float bottomOverload = GetWaterOverloadInCell(bottomIndex);
-
-	double ZOverload = topOverload - bottomOverload;
-	//CategoryName
-	UE_LOG(LogTemp, Warning, TEXT("RLOverload[%d]: %f, %f, FB: %f, %f TB: %f, %f"), index, rightOverload, leftOverload, frontOverload, behindOverload, topOverload, bottomOverload);
-	UE_LOG(LogTemp, Warning, TEXT("GetCurrentWaterLevel(%d): %f, GetWaterSpilt() %f, GetWaterCapacity(): %f"), index, Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(index), Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(index), Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCapacity(index));
+	*/
 
 	double overloadedAmount = Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(index) + Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(index) - Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCapacity(index);
 	if (overloadedAmount < PRECISION_OFFSET)
 		return;
 
+	std::vector<int> neighsToSpreadTo;
+	std::vector<float> spaceInNeighsToSpreadTo;
+	neighsToSpreadTo.reserve(6);
+	int leftIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetLeftNeighborIndex(index);
+	float leftFreeAmount = GetFreeAmountInCell(leftIndex);
+	if (leftFreeAmount > PRECISION_OFFSET) {
+		neighsToSpreadTo.emplace_back(leftIndex);
+		spaceInNeighsToSpreadTo.emplace_back(leftFreeAmount);
+	}
+
+	int rightIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetRightNeighborIndex(index);
+	float rightFreeAmount = GetFreeAmountInCell(rightIndex);
+	if (rightFreeAmount > PRECISION_OFFSET) {
+		neighsToSpreadTo.emplace_back(rightIndex);
+		spaceInNeighsToSpreadTo.emplace_back(rightFreeAmount);
+	}
+
+	int frontIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetFrontNeighborIndex(index);
+	float frontFreeAmount = GetFreeAmountInCell(frontIndex);
+	if (frontFreeAmount > PRECISION_OFFSET) {
+		neighsToSpreadTo.emplace_back(frontIndex);
+		spaceInNeighsToSpreadTo.emplace_back(frontFreeAmount);
+	}
+
+	int behindIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetBehindNeighborIndex(index);
+	float behindFreeAmount = GetFreeAmountInCell(behindIndex);
+	if (behindFreeAmount > PRECISION_OFFSET) {
+		neighsToSpreadTo.emplace_back(behindIndex);
+		spaceInNeighsToSpreadTo.emplace_back(behindFreeAmount);
+	}
+
+	int topIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetTopNeighborIndex(index);
+	float topFreeAmount = GetFreeAmountInCell(topIndex);
+	if (topFreeAmount > PRECISION_OFFSET) {
+		neighsToSpreadTo.emplace_back(topIndex);
+		spaceInNeighsToSpreadTo.emplace_back(topFreeAmount);
+	}
+
+	int bottomIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetBottomNeighborIndex(index);
+	float bottomFreeAmount = GetFreeAmountInCell(bottomIndex);
+	if (bottomFreeAmount > PRECISION_OFFSET) {
+		neighsToSpreadTo.emplace_back(bottomIndex);
+		spaceInNeighsToSpreadTo.emplace_back(bottomFreeAmount);
+	}
+
+
 	UE_LOG(LogTemp, Warning, TEXT("overloadedAmount[%d]: %f"), index, overloadedAmount);
 	double amountToSpread = std::clamp(overloadedAmount, 0.0, MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD);
 
-	double sumOfOverloadedNeighbours = std::fabs(XOverload) + std::fabs(YOverload);// + std::fabs(ZOverload);
+	int sumOfOverloadedNeighbours = neighsToSpreadTo.size();
 
-	if (sumOfOverloadedNeighbours < PRECISION_OFFSET)
-		return;
-
-	double amountToSpreadToX = (XOverload / sumOfOverloadedNeighbours) * amountToSpread;
-	double amountToSpreadToY = (YOverload / sumOfOverloadedNeighbours) * amountToSpread;
-	double amountToSpreadToZ = (ZOverload / sumOfOverloadedNeighbours) * amountToSpread;
+	float amountToSpreadToEach = amountToSpread / (float)neighsToSpreadTo.size();
 	//UE_LOG(LogTemp, Warning, TEXT("amountToSpreadToX: %f, amountToSpreadToY %f, amountToSpreadToZ %f"), amountToSpreadToX, amountToSpreadToY, amountToSpreadToZ);
+	float sumSpilt = 0.0f;
+	for (int i = 0; i < neighsToSpreadTo.size(); i++) {
+		float toSpill = std::clamp(amountToSpreadToEach, 0.0f, spaceInNeighsToSpreadTo[i]);
+		sumSpilt += toSpill;
+		Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(neighsToSpreadTo[i], toSpill);
+	}
 
-	if (amountToSpreadToX < 0.0f) {
-		Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(rightIndex, amountToSpreadToX);
-	}
-	else if (amountToSpreadToX > 0.0f) {
-		Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(leftIndex, amountToSpreadToX);
-	}
-
-	if (amountToSpreadToY < 0.0f) {
-		Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(frontIndex, amountToSpreadToY);
-	}
-	else if (amountToSpreadToY > 0.0f) {
-		Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(behindIndex, amountToSpreadToY);
-	}
-	
-	if (ZOverload < 0.0f) {
-		Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(topIndex, amountToSpreadToZ);
-	}
-	else if (ZOverload > 0.0f) {
-		Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(bottomIndex, amountToSpreadToZ);
-	} 
-	Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(index, -amountToSpread);
+	Grid3d::GetInstance(*waterSimGameInstance)->AddWaterSpilt(index, -sumSpilt);
 
 }
 
@@ -726,13 +745,32 @@ float AWorldController::GetWaterAmountDiff(const int& index, const int& neighbou
 	if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellWIthinBounds(neighbourIndex)) {
 		AWaterCube* waterCube = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(neighbourIndex);
 		if (waterCube == nullptr && !Grid3d::GetInstance(*waterSimGameInstance)->CheckIfBlockCell(neighbourIndex)) {
-			return 0.0f;
+			float neighWaterLevel = 0.0f;
+			float currWaterLevel = Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(index) + Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(index);
+			return currWaterLevel - neighWaterLevel;
 		}
 		if (waterCube != nullptr) {
 			float neighWaterLevel = Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(neighbourIndex) + Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(neighbourIndex);
 			float currWaterLevel = Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(index) + Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(index);
 			return currWaterLevel - neighWaterLevel;
 		}
+	}
+	return 0.0f;
+}
+
+float AWorldController::GetFreeAmountInCell(const int& index) {
+	if (!Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellWIthinBounds(index))
+		return 0.0f;
+	if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfBlockCell(index))
+		return 0.0f;
+
+	AWaterCube* waterCube = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(index);
+	if (waterCube == nullptr) {
+		return 1.0f;
+	}
+	if (waterCube != nullptr) {
+		double overload = Grid3d::GetInstance(*waterSimGameInstance)->GetCurrentWaterLevel(index) + Grid3d::GetInstance(*waterSimGameInstance)->GetWaterSpilt(index) - Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCapacity(index);
+		return std::clamp(overload, 0.0, MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD);
 	}
 	return 0.0f;
 }

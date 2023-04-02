@@ -8,6 +8,8 @@
 #include "WorldBorder.h"
 #include "WaterSimGameInstance.h"
 
+#define PRECISION_OFFSET 0.00001
+
 class UNREALCPPMANUAL_API Grid3d
 {
 private:
@@ -72,6 +74,8 @@ public:
 	void AddWaterSpilt(const int& index, const float& amount);
 	void SetWaterSpilt(const int& index, const float& amount);
 	float GetWaterCapacity(const int& index);
+	//bool GetCanWaterFlowHereState(const int& index);
+	//void SetCanWaterFlowHereState(const int& index, bool state);
 	void UpdateCubesTransform();
 };
 
