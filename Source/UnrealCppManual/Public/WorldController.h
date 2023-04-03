@@ -8,7 +8,7 @@
 #include "WorldController.generated.h"
 
 #define BASE_CAPACITY 1.0
-#define EXCEED_MODIFIER 0.02
+#define EXCEED_MODIFIER 0.05
 #define MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD 1.0
 
 UCLASS()
@@ -59,10 +59,8 @@ private:
 	void ResetClusters();
 	void DetermineWaterFlow();
 	void EvaluateFlowFromNeighbours(const int& index);
-	void FlowAccordingToPressure(const int& index);
 	void FlowPressurizedWaterUpwards();
 	float GetWaterOverloadInCell(const int& index);
 	float GetFreeAmountInCell(const int& index);
-	float GetWaterAmountDiff(const int& index, const int& neighbourIndex);
 #pragma endregion Physics
 };
