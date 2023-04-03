@@ -123,8 +123,6 @@ void AWorldController::SpillAround(const int& index) {
 		//UE_LOG(LogTemp, Warning, TEXT("Cannot fall down"));
 		std::vector<int> sideNeighbours;
 		sideNeighbours.reserve(4);
-		std::vector<int> diagonalNeighbours;
-		diagonalNeighbours.reserve(4);
 		//UE_LOG(LogTemp, Warning, TEXT("Current index: %d"), index);
 		int rightIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetRightNeighborIndex(index);
 
