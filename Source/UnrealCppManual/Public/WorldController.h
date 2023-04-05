@@ -60,7 +60,8 @@ private:
 	void DetermineWaterFlow();
 	void EvaluateFlowFromNeighbours(const int& index);
 	void FlowPressurizedWaterUpwards();
-	float GetWaterOverloadInCell(const int& index);
 	float GetFreeAmountInCell(const int& index);
 #pragma endregion Physics
+	std::vector<int> Get4HorizontalNeighbourIndices(const int& index);
+	std::vector<int> Get6AdjacentNeighbourIndices(const int& index);
 };

@@ -354,16 +354,15 @@ void AWorldController::CalculateWaterCubeCapacity() {
 }
 
 bool AWorldController::SetByNeighbourWaterCapacityIfPresent(const int& index) {
+
 	float highestCapacity = 0.0f;
 	bool isWaterAround = false;
-	int leftIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetLeftNeighborIndex(index);
-	GetHigherCapacity(highestCapacity, leftIndex, isWaterAround);
-	int frontIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetFrontNeighborIndex(index);
-	GetHigherCapacity(highestCapacity, frontIndex, isWaterAround);
-	int rightIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetRightNeighborIndex(index);
-	GetHigherCapacity(highestCapacity, rightIndex, isWaterAround);
-	int behindIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetBehindNeighborIndex(index);
-	GetHigherCapacity(highestCapacity, behindIndex, isWaterAround);
+	std::vector<int> neighbourIndices = Get4HorizontalNeighbourIndices(index);
+
+	for (int& neighIdx : neighbourIndices) {
+		GetHigherCapacity(highestCapacity, neighIdx, isWaterAround);
+	}
+
 	if (highestCapacity > BASE_CAPACITY - PRECISION_OFFSET) {
 		Grid3d::GetInstance(*waterSimGameInstance)->SetNextIterationCapacity(index, highestCapacity);
 		Grid3d::GetInstance(*waterSimGameInstance)->SetCapacityDetermined(index, false);
@@ -456,39 +455,17 @@ void AWorldController::TraverseAdjacentWaters(const int& currentCluster, const i
 		int currIdx = waterCubesToTraverse.back();
 		waterCubesToTraverse.pop_back();
 
-		//check all 4 neighbours
-		int leftIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetLeftNeighborIndex(currIdx);
-		if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellWIthinBounds(leftIndex)) {
-			AWaterCube* waterCube = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(leftIndex);
-			if (waterCube != nullptr && waterCube->clusterNum == 0) {
-				waterCubesToTraverse.emplace_back(leftIndex);
-				waterCube->clusterNum = currentCluster;
-			}
-		}
+		//check all 4 neighbours' clusters
 
-		int rightIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetRightNeighborIndex(currIdx);
-		if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellWIthinBounds(rightIndex)) {
-			AWaterCube* waterCube = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(rightIndex);
-			if (waterCube != nullptr && waterCube->clusterNum == 0) {
-				waterCubesToTraverse.emplace_back(rightIndex);
-				waterCube->clusterNum = currentCluster;
-			}
-		}
-		int frontIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetFrontNeighborIndex(currIdx);
-		if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellWIthinBounds(frontIndex)) {
-			AWaterCube* waterCube = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(frontIndex);
-			if (waterCube != nullptr && waterCube->clusterNum == 0) {
-				waterCubesToTraverse.emplace_back(frontIndex);
-				waterCube->clusterNum = currentCluster;
-			}
-		}
+		std::vector<int> neigbourIndices = Get4HorizontalNeighbourIndices(currIdx);
+		for (int& neighIdx : neigbourIndices) {
 
-		int behindIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetBehindNeighborIndex(currIdx);
-		if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellWIthinBounds(behindIndex)) {
-			AWaterCube* waterCube = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(behindIndex);
-			if (waterCube != nullptr && waterCube->clusterNum == 0) {
-				waterCubesToTraverse.emplace_back(behindIndex);
-				waterCube->clusterNum = currentCluster;
+			if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellWIthinBounds(neighIdx)) {
+				AWaterCube* waterCube = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(neighIdx);
+				if (waterCube != nullptr && waterCube->clusterNum == 0) {
+					waterCubesToTraverse.emplace_back(neighIdx);
+					waterCube->clusterNum = currentCluster;
+				}
 			}
 		}
 
@@ -587,56 +564,19 @@ void AWorldController::EvaluateFlowFromNeighbours(const int& index) {
 	spaceInNeighsToSpreadTo.reserve(6);
 	float summedSpaceInNeighs = 0;
 
-	int leftIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetLeftNeighborIndex(index);
-	float leftFreeAmount = GetFreeAmountInCell(leftIndex);
-	if (leftFreeAmount > -PRECISION_OFFSET) {
-		neighsIdxToSpreadTo.emplace_back(leftIndex);
-		spaceInNeighsToSpreadTo.emplace_back(leftFreeAmount);
-		summedSpaceInNeighs += leftFreeAmount;
+	std::vector<int> neighbourIndices = Get6AdjacentNeighbourIndices(index);
+
+	for (int& idx : neighbourIndices) {
+		float freeAmount = GetFreeAmountInCell(idx);
+		if (freeAmount > -PRECISION_OFFSET) { // free amount is set to -1.0f if the cell is out of world bounds or is a block
+			neighsIdxToSpreadTo.emplace_back(idx);
+			spaceInNeighsToSpreadTo.emplace_back(freeAmount);
+			summedSpaceInNeighs += freeAmount;
+		}
+
 	}
 
-	int rightIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetRightNeighborIndex(index);
-	float rightFreeAmount = GetFreeAmountInCell(rightIndex);
-	if (rightFreeAmount > -PRECISION_OFFSET) {
-		neighsIdxToSpreadTo.emplace_back(rightIndex);
-		spaceInNeighsToSpreadTo.emplace_back(rightFreeAmount);
-		summedSpaceInNeighs += rightFreeAmount;
-	}
-
-	int frontIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetFrontNeighborIndex(index);
-	float frontFreeAmount = GetFreeAmountInCell(frontIndex);
-	if (frontFreeAmount > -PRECISION_OFFSET) {
-		neighsIdxToSpreadTo.emplace_back(frontIndex);
-		spaceInNeighsToSpreadTo.emplace_back(frontFreeAmount);
-		summedSpaceInNeighs += frontFreeAmount;
-	}
-
-	int behindIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetBehindNeighborIndex(index);
-	float behindFreeAmount = GetFreeAmountInCell(behindIndex);
-	if (behindFreeAmount > -PRECISION_OFFSET) {
-		neighsIdxToSpreadTo.emplace_back(behindIndex);
-		spaceInNeighsToSpreadTo.emplace_back(behindFreeAmount);
-		summedSpaceInNeighs += behindFreeAmount;
-	}
-
-	int topIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetTopNeighborIndex(index);
-	float topFreeAmount = GetFreeAmountInCell(topIndex);
-	if (topFreeAmount > -PRECISION_OFFSET) {
-		neighsIdxToSpreadTo.emplace_back(topIndex);
-		spaceInNeighsToSpreadTo.emplace_back(topFreeAmount);
-		summedSpaceInNeighs += topFreeAmount;
-	}
-
-	int bottomIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetBottomNeighborIndex(index);
-	float bottomFreeAmount = GetFreeAmountInCell(bottomIndex);
-	if (bottomFreeAmount > -PRECISION_OFFSET) {
-		neighsIdxToSpreadTo.emplace_back(bottomIndex);
-		spaceInNeighsToSpreadTo.emplace_back(bottomFreeAmount);
-		summedSpaceInNeighs += bottomFreeAmount;
-	}
-
-
-	UE_LOG(LogTemp, Warning, TEXT("overloadedAmount[%d]: %f"), index, overloadedAmount);
+	//UE_LOG(LogTemp, Warning, TEXT("overloadedAmount[%d]: %f"), index, overloadedAmount);
 	double amountToSpread = std::clamp(overloadedAmount, 0.0, MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD);
 
 	if (summedSpaceInNeighs < PRECISION_OFFSET * 10) {
@@ -680,16 +620,24 @@ float AWorldController::GetFreeAmountInCell(const int& index) {
 	return -1.0f;
 }
 
-float AWorldController::GetWaterOverloadInCell(const int& index) {
-	if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellWIthinBounds(index)) {
-		AWaterCube* waterCube = Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfVisible(index);
-		if (waterCube == nullptr && !Grid3d::GetInstance(*waterSimGameInstance)->CheckIfBlockCell(index)) {
-			return 0.1f;
-		}
-		if (waterCube != nullptr) {
-			float overload = Grid3d::GetInstance(*waterSimGameInstance)->CalculateWaterOverload(index);
-			return overload;
-		}
-	}
-	return 1.0f;
+std::vector<int> AWorldController::Get4HorizontalNeighbourIndices(const int& index) {
+	std::vector<int> neighs;
+	neighs.reserve(4);
+	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetLeftNeighborIndex(index));
+	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetFrontNeighborIndex(index));
+	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetRightNeighborIndex(index));
+	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetBehindNeighborIndex(index));
+	return std::move(neighs);
+}
+
+std::vector<int> AWorldController::Get6AdjacentNeighbourIndices(const int& index) {
+	std::vector<int> neighs;
+	neighs.reserve(4);
+	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetLeftNeighborIndex(index));
+	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetFrontNeighborIndex(index));
+	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetRightNeighborIndex(index));
+	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetBehindNeighborIndex(index));
+	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetTopNeighborIndex(index));
+	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetBottomNeighborIndex(index));
+	return std::move(neighs);
 }
