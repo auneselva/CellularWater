@@ -632,7 +632,7 @@ std::vector<int> AWorldController::Get4HorizontalNeighbourIndices(const int& ind
 
 std::vector<int> AWorldController::Get6AdjacentNeighbourIndices(const int& index) {
 	std::vector<int> neighs;
-	neighs.reserve(4);
+	neighs.reserve(6);
 	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetLeftNeighborIndex(index));
 	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetFrontNeighborIndex(index));
 	neighs.emplace_back(Grid3d::GetInstance(*waterSimGameInstance)->GetRightNeighborIndex(index));
