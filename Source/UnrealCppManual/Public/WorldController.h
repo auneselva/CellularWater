@@ -20,7 +20,7 @@ public:
 	// Sets default values for this actor's properties
 	AWorldController();
 	~AWorldController();
-	class UWaterSimGameInstance* waterSimGameInstance;
+	class UWaterSimGameInstance* wsgi;
 	float simThreshold;
 	float moreOftenSimThreshold;
 

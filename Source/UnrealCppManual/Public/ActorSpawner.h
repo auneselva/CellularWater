@@ -31,7 +31,7 @@ public:
 
 protected:
 
-    UWaterSimGameInstance* waterSimGameInstance;
+    UWaterSimGameInstance* wsgi;
 
     virtual void BeginPlay() override;
     UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -29,7 +29,7 @@ AActorSpawner::~AActorSpawner() {
 
 void AActorSpawner::BeginPlay()
 {
-	waterSimGameInstance = Cast<UWaterSimGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	wsgi = Cast<UWaterSimGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	Super::BeginPlay();
 	CreateWorldBorders();
 
@@ -38,34 +38,34 @@ void AActorSpawner::BeginPlay()
 void AActorSpawner::SpawnWaterCube()
 {
 	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(spawner->GetActorLocation());
-	const int& cellIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetCellIndexAtFloatPosition(SpawnerLocation);
+	const int& cellIndex = Grid3d::GetInstance(*wsgi)->GetCellIndexAtFloatPosition(SpawnerLocation);
 
-	if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellFree(cellIndex))
+	if (Grid3d::GetInstance(*wsgi)->CheckIfCellFree(cellIndex))
 	{
-		if (Grid3d::GetInstance(*waterSimGameInstance)->GetWaterCubeIfPresent(cellIndex) != nullptr)
-			Grid3d::GetInstance(*waterSimGameInstance)->SetWaterCubeVisibility(cellIndex, true);
+		if (Grid3d::GetInstance(*wsgi)->GetWaterCubeIfPresent(cellIndex) != nullptr)
+			Grid3d::GetInstance(*wsgi)->SetWaterCubeVisibility(cellIndex, true);
 		else
 		{
-			AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*Grid3d::GetInstance(*waterSimGameInstance)->GetCellPosition(cellIndex), *defaultRotation);
-			double scale = (double)Grid3d::GetInstance(*waterSimGameInstance)->CellSize / *defaultScale;
+			AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*Grid3d::GetInstance(*wsgi)->GetCellPosition(cellIndex), *defaultRotation);
+			double scale = (double)Grid3d::GetInstance(*wsgi)->CellSize / *defaultScale;
 			newCube->SetActorScale3D(UE::Math::TVector<double>(scale, scale, scale));
-			Grid3d::GetInstance(*waterSimGameInstance)->SetWaterCubeInTheGrid(newCube, cellIndex);
+			Grid3d::GetInstance(*wsgi)->SetWaterCubeInTheGrid(newCube, cellIndex);
 		}
-		Grid3d::GetInstance(*waterSimGameInstance)->SetWaterLevel(cellIndex, 1.0f);
+		Grid3d::GetInstance(*wsgi)->SetWaterLevel(cellIndex, 1.0f);
 	}
 }
 
 void AActorSpawner::SpawnBlockCube()
 {
 	const std::shared_ptr<FVector> SpawnerLocation = std::make_shared<FVector>(spawner->GetActorLocation());
-	const int& cellIndex = Grid3d::GetInstance(*waterSimGameInstance)->GetCellIndexAtFloatPosition(SpawnerLocation);
+	const int& cellIndex = Grid3d::GetInstance(*wsgi)->GetCellIndexAtFloatPosition(SpawnerLocation);
 
-	if (Grid3d::GetInstance(*waterSimGameInstance)->CheckIfCellFree(cellIndex))
+	if (Grid3d::GetInstance(*wsgi)->CheckIfCellFree(cellIndex))
 	{
-		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*Grid3d::GetInstance(*waterSimGameInstance)->GetCellPosition(cellIndex), *defaultRotation);
-		double scale = (double) Grid3d::GetInstance(*waterSimGameInstance)->CellSize / *defaultScale;
+		ABlockCube* newCube = GetWorld()->SpawnActor<ABlockCube>((FVector)*Grid3d::GetInstance(*wsgi)->GetCellPosition(cellIndex), *defaultRotation);
+		double scale = (double) Grid3d::GetInstance(*wsgi)->CellSize / *defaultScale;
 		newCube->SetActorScale3D(UE::Math::TVector<double>(scale, scale, scale));
-		Grid3d::GetInstance(*waterSimGameInstance)->SetBlockCubeInTheGrid(cellIndex);
+		Grid3d::GetInstance(*wsgi)->SetBlockCubeInTheGrid(cellIndex);
 	}
 }
 void AActorSpawner::SpawnWorldBorder(FVector spawn, UE::Math::TVector<double> scale, FRotator3d rotator) {
@@ -77,16 +77,16 @@ void AActorSpawner::SpawnWorldBorder(FVector spawn, UE::Math::TVector<double> sc
 void AActorSpawner::CreateWorldBorders() {
 	// 12 orange lines
 
-	float xNCells = Grid3d::GetInstance(*waterSimGameInstance)->xNCells;
-	float yNCells = Grid3d::GetInstance(*waterSimGameInstance)->yNCells;
-	float zNCells = Grid3d::GetInstance(*waterSimGameInstance)->zNCells;
-	float XLeftBound = Grid3d::GetInstance(*waterSimGameInstance)->XLeftBound;
-	float XRightBound = Grid3d::GetInstance(*waterSimGameInstance)->XRightBound;
-	float YLeftBound = Grid3d::GetInstance(*waterSimGameInstance)->YLeftBound;
-	float YRightBound = Grid3d::GetInstance(*waterSimGameInstance)->YRightBound;
-	float ZLeftBound = Grid3d::GetInstance(*waterSimGameInstance)->ZLeftBound;
-	float ZRightBound = Grid3d::GetInstance(*waterSimGameInstance)->ZRightBound;
-	float CellSize = waterSimGameInstance->CellSize;
+	float xNCells = Grid3d::GetInstance(*wsgi)->xNCells;
+	float yNCells = Grid3d::GetInstance(*wsgi)->yNCells;
+	float zNCells = Grid3d::GetInstance(*wsgi)->zNCells;
+	float XLeftBound = Grid3d::GetInstance(*wsgi)->XLeftBound;
+	float XRightBound = Grid3d::GetInstance(*wsgi)->XRightBound;
+	float YLeftBound = Grid3d::GetInstance(*wsgi)->YLeftBound;
+	float YRightBound = Grid3d::GetInstance(*wsgi)->YRightBound;
+	float ZLeftBound = Grid3d::GetInstance(*wsgi)->ZLeftBound;
+	float ZRightBound = Grid3d::GetInstance(*wsgi)->ZRightBound;
+	float CellSize = wsgi->CellSize;
 
 	//down 
 	SpawnWorldBorder(FVector(CellSize * (XLeftBound - 0.5f), CellSize * (YLeftBound - 0.5f), CellSize * ZLeftBound), UE::Math::TVector<double>(0.1f, 0.1f, yNCells * CellSize / *defaultScale), FRotator3d(0.0f, 0.0f, 90.0f));
