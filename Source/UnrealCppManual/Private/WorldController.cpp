@@ -56,7 +56,6 @@ void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
 }
 
 void AWorldController::ApplySimulationProccesses() {
-	
 	for (int i = 0; i < Grid3d::GetInstance(*wsgi)->NCells; i++) {
 		if (Grid3d::GetInstance(*wsgi)->GetWaterCubeIfVisible(i) != nullptr) {
 			Gravity(i);
@@ -71,21 +70,20 @@ void AWorldController::ApplySimulationProccesses() {
 		if (GetWaterSpilt(i) > PRECISION_OFFSET)
 			UE_LOG(LogTemp, Warning, TEXT("%d: %f"), i, GetWaterSpilt(i));
 	}
-
 	UE_LOG(LogTemp, Warning, TEXT("\n\n\n\n\nWater Levels"));
 	for (int i = 0; i < N_CELLS; i++) {
 		if (GetCurrentWaterLevel(i) > PRECISION_OFFSET)
 			UE_LOG(LogTemp, Warning, TEXT("%d: %f"), i, GetCurrentWaterLevel(i))
 	} */
 	HandleSpiltWater();
-	
+
 	CalculateWaterCubeCapacity();
 	ApplyCalculatedCapacities(); //
 	ClusterizeWaterGroupsOnLevels();
 	for (int i = 0; i < Grid3d::GetInstance(*wsgi)->NCells; i++)
 		if (Grid3d::GetInstance(*wsgi)->GetWaterCubeIfVisible(i) != nullptr)
 			UE_LOG(LogTemp, Warning, TEXT("GetCurrentWaterLevel(%d): %f, GetWaterSpilt() %f, GetWaterCapacity(): %f"), i, Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(i), Grid3d::GetInstance(*wsgi)->GetWaterSpilt(i), Grid3d::GetInstance(*wsgi)->GetWaterCapacity(i));
-	
+
 	DetermineWaterFlow();
 	HandleSpiltWater();
 	FlowPressurizedWaterUpwards();
@@ -227,22 +225,6 @@ bool AWorldController::CanWaterFallDown(const int& currentIndex) {
 			return true;
 	}
 	return false;
-}
-
-bool AWorldController::CanWaterSpillAround(const int& index) {
-	int bottomIndex = Grid3d::GetInstance(*wsgi)->GetBottomNeighborIndex(index);
-	if (!Grid3d::GetInstance(*wsgi)->CheckIfCellWIthinBounds(bottomIndex))
-		return true;
-	if (Grid3d::GetInstance(*wsgi)->CheckIfBlockCell(bottomIndex))
-		return true;
-	if (Grid3d::GetInstance(*wsgi)->GetWaterCubeIfVisible(bottomIndex) == nullptr)
-		return true;
-	if (!Grid3d::GetInstance(*wsgi)->CheckIfFullCapacityReached(bottomIndex, Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(bottomIndex)))
-		return true;
-	if ( 0.2f > Grid3d::GetInstance(*wsgi)->GetWaterSpilt(bottomIndex)  && Grid3d::GetInstance(*wsgi)->GetWaterSpilt(bottomIndex) > PRECISION_OFFSET)
-		return true;
-	return false;
-
 }
 
 void AWorldController::HandleSpiltWater() { //or handle pressure?
@@ -500,7 +482,7 @@ void AWorldController::DetermineWaterFlow() {
 	for (int i = 0; i < Grid3d::GetInstance(*wsgi)->NCells; i++) {
 		AWaterCube* waterCube = Grid3d::GetInstance(*wsgi)->GetWaterCubeIfVisible(i);
 		if (waterCube != nullptr) {
-			float currentLevel = Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(i);
+			float currentLevel = Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(i) + Grid3d::GetInstance(*wsgi)->GetWaterSpilt(i);
 			if (Grid3d::GetInstance(*wsgi)->CheckIfFullCapacityReached(i, currentLevel) && !CanWaterFallDown(i)) {
 				EvaluateFlowFromNeighbours(i);
 				//FlowAccordingToPressure(i);
@@ -538,7 +520,7 @@ void AWorldController::FlowPressurizedWaterUpwards() {
 		float upShouldBeCapacity = std::clamp(currWaterCube->currentWaterCapacity - EXCEED_MODIFIER, BASE_CAPACITY, currWaterCube->currentWaterCapacity - EXCEED_MODIFIER);
 		float upFreeAmount = std::clamp(upShouldBeCapacity - upWaterLevel, 0.0f, upShouldBeCapacity - upWaterLevel);
 		float waterToFlowUp = std::clamp(Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(i) + Grid3d::GetInstance(*wsgi)->GetWaterSpilt(i) - (float)(BASE_CAPACITY + EXCEED_MODIFIER), 0.0f, upFreeAmount);
-
+		UE_LOG(LogTemp, Warning, TEXT("[%d]upwater: %f"), i, waterToFlowUp);
 
 		Grid3d::GetInstance(*wsgi)->AddWaterSpilt(topIndex, waterToFlowUp);
 		Grid3d::GetInstance(*wsgi)->AddWaterSpilt(i, -waterToFlowUp);

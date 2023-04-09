@@ -17,7 +17,7 @@ float AWaterCube::BColorRange = AWaterCube::maxBColor - AWaterCube::minBColor;
 AWaterCube::AWaterCube() : currentWaterCapacity(BASE_CAPACITY), nextIterationWaterCapacity(BASE_CAPACITY), isCapacityUndetermined(false), clusterNum(0)
 {
 
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	VisualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(VisualMesh);
@@ -60,11 +60,11 @@ void AWaterCube::SetWaterColorByCapacity() {
 	lvlOfCapacity = (currentWaterCapacity - (float)BASE_CAPACITY) / capacityRange;
 	color->G = maxGColor - GColorRange * lvlOfCapacity;
 	color->B = maxBColor - BColorRange * lvlOfCapacity;
+
 	if (material->IsValidLowLevel()) {
-		//UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
+		//UE_LOG(LogTemp, Warning, TEXT("%d The RGBAs value is %f, %f, %f, %f"), GetCurrentGridIndex(),color->R, color->G, color->B, color->A);
 		material->SetVectorParameterValue(FName(TEXT("WaterColor")), *color);
 	}
-//UE_LOG(LogTemp, Warning, TEXT("The RGBAs value is %f, %f, %f, %f"), color->R, color->G, color->B, color->A);
 }
 
 void AWaterCube::ChangeColorInTime(const float &delta) {
@@ -79,14 +79,6 @@ void AWaterCube::ChangeColorInTime(const float &delta) {
 		color->R -= (0.05f * delta);
 	color->G = 0.2f + (color->R / 1.0f) * 0.8f;
 	//std::clamp(color.B, 0.0f, 1.0f);
-}
-
-void AWaterCube::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	SetWaterColorByCapacity();
-	//ChangeColorInTime(DeltaTime);
-
 }
 
 

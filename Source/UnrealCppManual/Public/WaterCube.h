@@ -20,10 +20,8 @@ private:
 	bool colorRaising;
 
 	float lvlOfCapacity;
-	void SetWaterColorByCapacity();
 	void ChangeColorInTime(const float &delta);
 public:	
-	// Sets default values for this actor's properties
 	AWaterCube();
 	~AWaterCube();
 
@@ -42,11 +40,9 @@ public:
 	int clusterNum;
 	void SetCurrentGridIndex(const int& index);
 	int GetCurrentGridIndex();
+	void SetWaterColorByCapacity();
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 };

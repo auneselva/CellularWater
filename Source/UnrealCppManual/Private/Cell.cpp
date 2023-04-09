@@ -51,4 +51,6 @@ void Cell::AdjustWaterCubesTransformIfPresent(const int& cell_size) {
 	//UE::Math::TVector<double> offset = UE::Math::TVector<double>(0.0, 0.0, ((double)(cell_size)) / 5.0 *(level - 1.0));
 
 	WaterCube->SetActorLocation(*position);
+	WaterCube->SetWaterColorByCapacity();
+
 }

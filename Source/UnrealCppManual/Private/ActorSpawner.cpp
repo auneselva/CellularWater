@@ -42,14 +42,16 @@ void AActorSpawner::SpawnWaterCube()
 
 	if (Grid3d::GetInstance(*wsgi)->CheckIfCellFree(cellIndex))
 	{
-		if (Grid3d::GetInstance(*wsgi)->GetWaterCubeIfPresent(cellIndex) != nullptr)
+		if (Grid3d::GetInstance(*wsgi)->GetWaterCubeIfPresent(cellIndex) != nullptr) {
 			Grid3d::GetInstance(*wsgi)->SetWaterCubeVisibility(cellIndex, true);
+		}
 		else
 		{
 			AWaterCube* newCube = GetWorld()->SpawnActor<AWaterCube>((FVector)*Grid3d::GetInstance(*wsgi)->GetCellPosition(cellIndex), *defaultRotation);
 			double scale = (double)Grid3d::GetInstance(*wsgi)->CellSize / *defaultScale;
 			newCube->SetActorScale3D(UE::Math::TVector<double>(scale, scale, scale));
 			Grid3d::GetInstance(*wsgi)->SetWaterCubeInTheGrid(newCube, cellIndex);
+			newCube->SetWaterColorByCapacity();
 		}
 		Grid3d::GetInstance(*wsgi)->SetWaterLevel(cellIndex, 1.0f);
 	}

@@ -22,6 +22,7 @@ public:
 	~AWorldController();
 	class UWaterSimGameInstance* wsgi;
 	float simThreshold;
+
 	float moreOftenSimThreshold;
 
 	FRotator3d* defaultRotation;
@@ -45,7 +46,6 @@ private:
 	void SpillAround(const int& index);
 	bool IsNeighbourFreeToBeSpilledTo(const int& currentIndex, const int& neighbourIndex);
 	bool CanWaterFallDown(const int& currentIndex);
-	bool CanWaterSpillAround(const int& index);
 	void HandleSpiltWater();
 	void ApplyNextIterWaterToCurrent();
 	void ApplySimulationProccesses();
