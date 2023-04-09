@@ -248,15 +248,24 @@ const UE::Math::TVector<double>* Grid3d::GetCellPosition(const int& index)
 {
 	return grid3d[index].GetPosition();
 }
-/*
-bool Grid3d::GetCanWaterFlowHereState(const int& index) {
-	return grid3d[index].canWaterBeFallenHere;
+
+void Grid3d::SetCanWaterBeFlowDownFromHere(const int& index, bool state) {
+	grid3d[index].canWaterBeFlowDownFromHere = state;
+	grid3d[index].lockedFlowDownCounter = 0;
 }
-
-void Grid3d::SetCanWaterFlowHereState(const int& index, bool state) {
-	grid3d[index].canWaterBeFallenHere = state;
-} */
-
+bool Grid3d::GetCanWaterBeFlowDownFromHere(const int& index) {
+	return grid3d[index].canWaterBeFlowDownFromHere;
+}
+void Grid3d::UpdateLockedFlowDownCellsCounter() {
+	for (int i = 0; i < NCells; i++) {
+		if (!GetCanWaterBeFlowDownFromHere(i)) {
+			grid3d[i].lockedFlowDownCounter++;
+			if (grid3d[i].lockedFlowDownCounter > 8) {
+				SetCanWaterBeFlowDownFromHere(i, true);
+			}
+		}
+	}
+}
 void Grid3d::UpdateCubesTransform() {
 	for (int i = 0; i < NCells; i++) {
 		grid3d[i].AdjustWaterCubesTransformIfPresent(CellSize);

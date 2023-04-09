@@ -11,7 +11,7 @@ Cell::Cell()
 	blockCell = false;
 }
 */
-Cell::Cell() : WaterCube(nullptr), blockCell(false), nextIterationWaterLevel(0.0f), currentWaterLevel(0.0f), waterSpilt(0.0f), canWaterBeFallenHere(true)
+Cell::Cell() : WaterCube(nullptr), blockCell(false), nextIterationWaterLevel(0.0f), currentWaterLevel(0.0f), waterSpilt(0.0f), canWaterBeFlowDownFromHere(true)
 {
 } 
 
@@ -42,8 +42,8 @@ const UE::Math::TVector<double> * Cell::GetPosition() {
 void Cell::AdjustWaterCubesTransformIfPresent(const int& cell_size) {
 	if (WaterCube == nullptr)
 		return;
-	if (WaterCube->IsHidden())
-		return;
+	//if (WaterCube->IsHidden())
+	//	return;
 
 	float level = std::clamp(currentWaterLevel, 0.0f, 1.0f);
 	//UE_LOG(LogTemp, Warning, TEXT("i: %d, cell_size: %f, Current Water level: %f, offset: %f"), WaterCube->GetCurrentGridIndex(), (double)cell_size, level, (double)cell_size / 2.0 * (level - 1.0));

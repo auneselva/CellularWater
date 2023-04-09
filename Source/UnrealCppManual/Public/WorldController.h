@@ -8,7 +8,7 @@
 #include "WorldController.generated.h"
 
 #define BASE_CAPACITY 1.0
-#define EXCEED_MODIFIER 0.05
+#define EXCEED_MODIFIER 0.04
 #define MAX_PRESSURED_AMOUNT_ALLOWED_TO_SPREAD 1.0
 
 UCLASS()

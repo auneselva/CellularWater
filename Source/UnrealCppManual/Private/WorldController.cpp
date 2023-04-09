@@ -45,17 +45,10 @@ void AWorldController::Tick(float DeltaTime) //delta time == around 0.02
 		ApplySimulationProccesses();
 		simCounter++;
 	}
-	/*
-	if (moreOftenGameTimeElapsed > moreOftenSimThreshold) {
-		moreOftenGameTimeElapsed -= moreOftenSimThreshold;
-		FlowPressurizedWaterUpwards();
-		HandleSpiltWater();
-		Grid3d::GetInstance(*wsgi)->UpdateCubesTransform();
-	}
-	*/
 }
 
 void AWorldController::ApplySimulationProccesses() {
+
 	for (int i = 0; i < Grid3d::GetInstance(*wsgi)->NCells; i++) {
 		if (Grid3d::GetInstance(*wsgi)->GetWaterCubeIfVisible(i) != nullptr) {
 			Gravity(i);
@@ -64,36 +57,21 @@ void AWorldController::ApplySimulationProccesses() {
 		if (i % Grid3d::GetInstance(*wsgi)->xyNCells == Grid3d::GetInstance(*wsgi)->xyNCells - 1)
 			HandleSpiltWater();
 	}
-	/*
-	UE_LOG(LogTemp, Warning, TEXT("\n\n\n\n\nWater Splitted"));
-	for (int i = 0; i < N_CELLS; i++) {
-		if (GetWaterSpilt(i) > PRECISION_OFFSET)
-			UE_LOG(LogTemp, Warning, TEXT("%d: %f"), i, GetWaterSpilt(i));
+	if (simCounter % 2 == 0) {
+
+		CalculateWaterCubeCapacity();
+		ApplyCalculatedCapacities(); //
+		ClusterizeWaterGroupsOnLevels();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("\n\n\n\n\nWater Levels"));
-	for (int i = 0; i < N_CELLS; i++) {
-		if (GetCurrentWaterLevel(i) > PRECISION_OFFSET)
-			UE_LOG(LogTemp, Warning, TEXT("%d: %f"), i, GetCurrentWaterLevel(i))
-	} */
-	HandleSpiltWater();
-
-	CalculateWaterCubeCapacity();
-	ApplyCalculatedCapacities(); //
-	ClusterizeWaterGroupsOnLevels();
-	for (int i = 0; i < Grid3d::GetInstance(*wsgi)->NCells; i++)
-		if (Grid3d::GetInstance(*wsgi)->GetWaterCubeIfVisible(i) != nullptr)
-			UE_LOG(LogTemp, Warning, TEXT("GetCurrentWaterLevel(%d): %f, GetWaterSpilt() %f, GetWaterCapacity(): %f"), i, Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(i), Grid3d::GetInstance(*wsgi)->GetWaterSpilt(i), Grid3d::GetInstance(*wsgi)->GetWaterCapacity(i));
-
 	DetermineWaterFlow();
 	HandleSpiltWater();
 	FlowPressurizedWaterUpwards();
 	//UE_LOG(LogTemp, Warning, TEXT("After Pressurizing"));
-	for (int i = 0; i < Grid3d::GetInstance(*wsgi)->NCells; i++)
-		if (Grid3d::GetInstance(*wsgi)->GetWaterCubeIfVisible(i) != nullptr)
-			UE_LOG(LogTemp, Warning, TEXT("GetCurrentWaterLevel(%d): %f, GetWaterSpilt() %f, GetWaterCapacity(): %f"), i, Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(i), Grid3d::GetInstance(*wsgi)->GetWaterSpilt(i), Grid3d::GetInstance(*wsgi)->GetWaterCapacity(i));
 
 	HandleSpiltWater();
+	Grid3d::GetInstance(*wsgi)->UpdateLockedFlowDownCellsCounter();
 	Grid3d::GetInstance(*wsgi)->UpdateCubesTransform();
+
 }
 
 void AWorldController::Gravity(const int& index) {
@@ -101,8 +79,14 @@ void AWorldController::Gravity(const int& index) {
 	if (CanWaterFallDown(index)) {
 		int bottomIndex = Grid3d::GetInstance(*wsgi)->GetBottomNeighborIndex(index);
 		if (Grid3d::GetInstance(*wsgi)->GetWaterCubeIfVisible(bottomIndex) != nullptr) {
-			float waterAmountToBeFlown = Grid3d::GetInstance(*wsgi)->GetWaterCapacity(bottomIndex) - Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(bottomIndex) - Grid3d::GetInstance(*wsgi)->GetWaterSpilt(bottomIndex);
+
+			float freeSpace = Grid3d::GetInstance(*wsgi)->GetWaterCapacity(bottomIndex) - Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(bottomIndex) - Grid3d::GetInstance(*wsgi)->GetWaterSpilt(bottomIndex);
+			freeSpace = std::clamp(freeSpace, 0.0f, freeSpace);
+			float waterAmount = Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(index) + Grid3d::GetInstance(*wsgi)->GetWaterSpilt(index);
+			//if (waterAmount < 0.3 * BASE_CAPACITY && !Grid3d::GetInstance(*wsgi)->GetCanWaterBeFlowDownFromHere(index))
+			//	return;
 			
+			float waterAmountToBeFlown = freeSpace;
 			Grid3d::GetInstance(*wsgi)->AddWaterSpilt(bottomIndex, waterAmountToBeFlown);
 			Grid3d::GetInstance(*wsgi)->AddWaterSpilt(index, -waterAmountToBeFlown);
 		}
@@ -515,15 +499,17 @@ void AWorldController::FlowPressurizedWaterUpwards() {
 		int topIndex = Grid3d::GetInstance(*wsgi)->GetTopNeighborIndex(i);
 		if (!Grid3d::GetInstance(*wsgi)->CheckIfCellWIthinBounds(topIndex) || Grid3d::GetInstance(*wsgi)->CheckIfBlockCell(topIndex))
 			continue;
+
 		//check if cube is pressurized
 		float upWaterLevel = Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(topIndex) + Grid3d::GetInstance(*wsgi)->GetWaterSpilt(topIndex);
 		float upShouldBeCapacity = std::clamp(currWaterCube->currentWaterCapacity - EXCEED_MODIFIER, BASE_CAPACITY, currWaterCube->currentWaterCapacity - EXCEED_MODIFIER);
 		float upFreeAmount = std::clamp(upShouldBeCapacity - upWaterLevel, 0.0f, upShouldBeCapacity - upWaterLevel);
 		float waterToFlowUp = std::clamp(Grid3d::GetInstance(*wsgi)->GetCurrentWaterLevel(i) + Grid3d::GetInstance(*wsgi)->GetWaterSpilt(i) - (float)(BASE_CAPACITY + EXCEED_MODIFIER), 0.0f, upFreeAmount);
-		UE_LOG(LogTemp, Warning, TEXT("[%d]upwater: %f"), i, waterToFlowUp);
+		//UE_LOG(LogTemp, Warning, TEXT("[%d]upwater: %f"), i, waterToFlowUp);
 
 		Grid3d::GetInstance(*wsgi)->AddWaterSpilt(topIndex, waterToFlowUp);
 		Grid3d::GetInstance(*wsgi)->AddWaterSpilt(i, -waterToFlowUp);
+
 	}
 
 }

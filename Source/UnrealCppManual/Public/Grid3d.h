@@ -74,8 +74,9 @@ public:
 	void AddWaterSpilt(const int& index, const float& amount);
 	void SetWaterSpilt(const int& index, const float& amount);
 	float GetWaterCapacity(const int& index);
-	//bool GetCanWaterFlowHereState(const int& index);
-	//void SetCanWaterFlowHereState(const int& index, bool state);
+	void SetCanWaterBeFlowDownFromHere(const int& index, bool state);
+	bool GetCanWaterBeFlowDownFromHere(const int& index);
+	void UpdateLockedFlowDownCellsCounter();
 	void UpdateCubesTransform();
 };
 
