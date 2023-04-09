@@ -60,7 +60,7 @@ void AWorldController::ApplySimulationProccesses() {
 	if (simCounter % 2 == 0) {
 
 		CalculateWaterCubeCapacity();
-		ApplyCalculatedCapacities(); //
+		ApplyCalculatedCapacities();
 		ClusterizeWaterGroupsOnLevels();
 	}
 	DetermineWaterFlow();
@@ -69,7 +69,6 @@ void AWorldController::ApplySimulationProccesses() {
 	//UE_LOG(LogTemp, Warning, TEXT("After Pressurizing"));
 
 	HandleSpiltWater();
-	Grid3d::GetInstance(*wsgi)->UpdateLockedFlowDownCellsCounter();
 	Grid3d::GetInstance(*wsgi)->UpdateCubesTransform();
 
 }
