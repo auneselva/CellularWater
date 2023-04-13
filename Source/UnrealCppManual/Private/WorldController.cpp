@@ -57,7 +57,7 @@ void AWorldController::ApplySimulationProccesses() {
 		if (i % Grid3d::GetInstance(*wsgi)->xyNCells == Grid3d::GetInstance(*wsgi)->xyNCells - 1)
 			HandleSpiltWater();
 	}
-	if (simCounter % 2 == 0) {
+	if (simCounter % 4 == 0) {
 
 		CalculateWaterCubeCapacity();
 		ApplyCalculatedCapacities();
