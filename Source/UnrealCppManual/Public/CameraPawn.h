@@ -19,31 +19,35 @@ public:
 	UPROPERTY(EditAnywhere)
 		UStaticMeshComponent* StaticMeshComp;
 protected:
+
+	float boostSpeed;
+	float boostSpeedSpawner;
+	float ZoomFactor;
+	bool bZoomingIn;
+	FVector3d MovementInput;
+	FVector3d MovementInputSpawner;
+	FVector2D CameraInput;
+
 	UPROPERTY(EditAnywhere)
 		class USpringArmComponent* SpringArmComp;
 
 	UPROPERTY(EditAnywhere)
 		class UCameraComponent* CameraComp;
 
-	FVector3d MovementInput;
-	float boostSpeed;
-	FVector3d MovementInputSpawner;
-	float boostSpeedSpawner;
-	FVector2D CameraInput;
-	float ZoomFactor;
-	bool bZoomingIn;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 private:
+
+	bool changeCameraLock;
+	bool spawnerAttached;
+
 	UPROPERTY(EditAnywhere)
 		int cameraID;
 	UPROPERTY(EditAnywhere)
 		ACameraPawn* Cameras[3];
 	UPROPERTY(EditAnywhere)
 		AActor* spawner;
-	bool changeCameraLock;
-	bool spawnerAttached;
 
 	void MoveForwardCamera(float AxisValue);
 	void MoveRightCamera(float AxisValue);

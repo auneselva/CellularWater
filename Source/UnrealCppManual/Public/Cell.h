@@ -13,14 +13,14 @@ public:
 	//uniqueptr
 	AWaterCube* WaterCube;
 	bool blockCell;
+	bool canWaterBeFlowDownFromHere;
 	float nextIterationWaterLevel;
 	float currentWaterLevel;
 	float waterSpilt;
-	bool canWaterBeFlowDownFromHere;
 	int lockedFlowDownCounter;
 	void CalculatePosition(const int& index, const int& cell_size, const int& XLeftBound, const int& XRightBound, const int& YLeftBound, const int& YRightBound, const int& ZLeftBound, const int& ZRightBound);
-	const UE::Math::TVector<double>* GetPosition();
 	void AdjustWaterCubesTransformIfPresent(const int& cell_size);
+	const UE::Math::TVector<double>* GetPosition();
 private:
 	const UE::Math::TVector<double>* position;
 };

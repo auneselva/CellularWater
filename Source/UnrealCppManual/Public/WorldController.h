@@ -23,8 +23,6 @@ public:
 	class UWaterSimGameInstance* wsgi;
 	float simThreshold;
 
-	float moreOftenSimThreshold;
-
 	FRotator3d* defaultRotation;
 	virtual void Tick(float DeltaTime) override;
 protected:

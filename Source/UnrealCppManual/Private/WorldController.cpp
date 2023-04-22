@@ -25,12 +25,10 @@ void AWorldController::BeginPlay()
 	wsgi = Cast<UWaterSimGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
 	simThreshold = 1.0f / (float)wsgi->SimulationSpeed * 2.0f;
-	moreOftenSimThreshold = simThreshold / 5.0f;
 	Grid3d::GetInstance(*wsgi);
 	Super::BeginPlay();
 
 	gameTimeElapsed = 0.0f;
-	moreOftenGameTimeElapsed = 0.0f;
 	simCounter = 0;
 }
 

@@ -11,7 +11,7 @@ Cell::Cell()
 	blockCell = false;
 }
 */
-Cell::Cell() : WaterCube(nullptr), blockCell(false), nextIterationWaterLevel(0.0f), currentWaterLevel(0.0f), waterSpilt(0.0f), canWaterBeFlowDownFromHere(true)
+Cell::Cell() : WaterCube(nullptr), blockCell(false), canWaterBeFlowDownFromHere(true), nextIterationWaterLevel(0.0f), currentWaterLevel(0.0f), waterSpilt(0.0f)
 {
 } 
 
