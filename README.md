@@ -4,7 +4,9 @@
 ABOUT
 
 
-Personal project. Water simulation implementation using cellular automata in Unreal Engine. The water is meant to be spawned by user and act accordingly; fall down when there is no block cell or world border below, and spill otherwise. Also, levels in connected vessels should endeavor to be the same.
+Old personal project made during my very beginnings with Unreal Engine. 
+
+Water simulation implementation using cellular automata in Unreal Engine. The water is meant to be spawned by user and act accordingly; fall down when there is no block cell or world border below, and spill otherwise. Also, levels in connected vessels should endeavor to be the same.
 The concept of how to simulate pressure is taken from the following article: https://w-shadow.com/blog/2009/09/01/simple-fluid-simulation/, where the amount of water a cell can contain is specified by the number of water cells stacked on it.
 For now, it is done in the project, however there are some glitches when a large water area reaches border level - I would like to spend some time in the future repairing those. 
 
